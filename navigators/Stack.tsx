@@ -1,10 +1,10 @@
 import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
-import { useColorScheme } from 'react-native';
 import { StatusBar } from 'expo-status-bar';
 
 import globalStyles from '../styles/Styles';
+import { useThemeMode } from '../styles/ThemeProvider';
 
 import Tabs from './Tabs';
 import Login from '../screens/Login';
@@ -27,7 +27,7 @@ type RootStackParamList = {
 const Stack = createStackNavigator<RootStackParamList>();
 
 export default function StackNavigator() {
-    const theme = useColorScheme();
+    const { theme } = useThemeMode();
 
     return (
         <SafeAreaProvider>

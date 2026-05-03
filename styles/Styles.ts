@@ -1,5 +1,6 @@
 import { StyleSheet, type TextStyle, type ViewStyle } from 'react-native';
 import globalColors from './Colors';
+import type { ThemeMode } from './Theme';
 
 export type GlobalStyleVariables = {
     screenMargin: number;
@@ -53,7 +54,7 @@ type GlobalStyleMap = {
     alignRight: ViewStyle;
 };
 
-export default function globalStyles(force = ''): GlobalStyleMap {
+export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap {
     return StyleSheet.create({
         // text
         title: {

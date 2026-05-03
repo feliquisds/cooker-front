@@ -47,16 +47,6 @@ export default function Saved({ navigation }: ReportsProps) {
         <SimpleScreen tabScreen>
             <Title>Relatório</Title>
 
-            <GradientCard gradient={globalColors().ai}>
-                <CardElement gap={15}>
-                    <Section horizontal spaceBetween centerVertical gap={5}>
-                        <Header style={{ color: 'white', width: '70%' }}>Dificuldade em matemática</Header>
-                    </Section>
-                    <Text style={{ color: 'white' }}>Acompanhe o desempenho de seu filho com nossa IA</Text>
-                    <SlimSimpleButton gradient={globalColors().ai} onPress={() => navigation.navigate('AIReport')}>Ver análise de desempenho</SlimSimpleButton>
-                </CardElement>
-            </GradientCard>
-
             <Card label={'Notas'}>
                 <FlatList
                     data={DATA}

@@ -6,6 +6,7 @@ import { GradientSubtext } from './Texts';
 import { Section } from './Alignments';
 import globalStyles from '../styles/Styles';
 import globalColors from '../styles/Colors';
+import { useThemeMode } from '../styles/ThemeProvider';
 
 function getTabBarIcon(route: string, focused: boolean) {
     let icon: keyof typeof MaterialCommunityIcons.glyphMap | undefined;
@@ -32,15 +33,17 @@ function getTabBarIcon(route: string, focused: boolean) {
 
 export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const { buildHref } = useLinkBuilder();
+    const { theme } = useThemeMode();
+    const themedColors = globalColors(theme);
 
     return (
         <Section horizontal style={globalStyles().tabBar}>
             {state.routes.map((route, index) => {
                 const { options } = descriptors[route.key];
                 const isFocused = state.index === index;
-                const accent = globalColors().accent;
-                const inactive = globalColors().inactive;
-                const foreground = globalColors().foreground;
+                const accent = themedColors.accent;
+                const inactive = themedColors.inactive;
+                const foreground = themedColors.foreground;
 
                 const label = options.title !== undefined
                                 ? options.title

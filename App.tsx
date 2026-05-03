@@ -1,5 +1,10 @@
 import Stack from './navigators/Stack';
+import { ThemeProvider } from './styles/ThemeProvider';
 
 export default function App() {
-    return <Stack />;
+    return (
+        <ThemeProvider>
+            <Stack />
+        </ThemeProvider>
+    );
 }

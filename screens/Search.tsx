@@ -124,7 +124,7 @@ export default function Search() {
     return (
         <SimpleScreen tabScreen>
             <Section gap={15}>
-                <Title>Avisos</Title>
+                <Title>Buscar</Title>
 
                 <FlatList
                     data={DATA}

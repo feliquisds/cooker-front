@@ -1,5 +1,5 @@
-import { useColorScheme } from 'react-native';
 import type { Gradient } from '../components/Types';
+import { resolveThemeMode, type ThemeMode } from './Theme';
 
 type ThemeColors = {
     background: string;
@@ -10,52 +10,49 @@ type ThemeColors = {
     navigation: string;
     inactive: string;
     accent: Gradient;
-    ai: Gradient;
+    redHighlight: string;
     buttonText: string;
 };
 
-const fixedColors: Pick<ThemeColors, 'accent' | 'ai' | 'buttonText'> = {
-    accent: ['#FF5B8F', '#FF9A4E'],
-    ai: ['#4c8dff', '#0309C4'],
+const fixedColors: Pick<ThemeColors, 'accent' | 'redHighlight' | 'buttonText'> = {
+    accent: ['#FF5E19', '#FFB074'],
+    redHighlight: '#EF3E59',
     buttonText: '#FFFFFF'
 };
 
 const lightColors: ThemeColors = {
-    background: '#F2F2F7',
-    text: '#000000',
+    background: '#F3F3F5',
+    text: '#1D1D1F',
     foreground: '#FFFFFF',
-    divider: '#DFDFEC',
-    subtext: '#75758A',
+    divider: '#D3D3D5',
+    subtext: '#6E6E73',
     navigation: '#FFFFFF66',
-    inactive: '#ADADB5',
+    inactive: '#C3C3CF',
     ...fixedColors
 };
 
 const darkColors: ThemeColors = {
-    background: '#000000',
-    text: '#FFFFFF',
-    foreground: '#1C1C1E',
-    divider: '#363638',
-    subtext: '#919199',
-    navigation: '#1B1B1D66',
-    inactive: '#777783',
+    background: '#252525',
+    text: '#DFDFE1',
+    foreground: '#323232',
+    divider: '#464649',
+    subtext: '#949498',
+    navigation: '#15151766',
+    inactive: '#646468',
     ...fixedColors
 };
 
-export default function globalColors(force = ''): ThemeColors {
-    const theme = useColorScheme();
-
-    if (force == 'light') return lightColors;
-    if (force == 'dark') return darkColors;
+export default function globalColors(force: ThemeMode | '' = ''): ThemeColors {
+    const theme = resolveThemeMode(force);
 
     return {
-        background: theme == 'dark' ? darkColors.background : lightColors.background,
-        text: theme == 'dark' ? darkColors.text : lightColors.text,
-        foreground: theme == 'dark' ? darkColors.foreground : lightColors.foreground,
-        divider: theme == 'dark' ? darkColors.divider : lightColors.divider,
-        subtext: theme == 'dark' ? darkColors.subtext : lightColors.subtext,
-        navigation: theme == 'dark' ? darkColors.navigation : lightColors.navigation,
-        inactive: theme == 'dark' ? darkColors.inactive : lightColors.inactive,
+        background: theme === 'dark' ? darkColors.background : lightColors.background,
+        text: theme === 'dark' ? darkColors.text : lightColors.text,
+        foreground: theme === 'dark' ? darkColors.foreground : lightColors.foreground,
+        divider: theme === 'dark' ? darkColors.divider : lightColors.divider,
+        subtext: theme === 'dark' ? darkColors.subtext : lightColors.subtext,
+        navigation: theme === 'dark' ? darkColors.navigation : lightColors.navigation,
+        inactive: theme === 'dark' ? darkColors.inactive : lightColors.inactive,
         ...fixedColors
     };
 }

@@ -81,7 +81,7 @@ export function BackButton({ navigation }: BackButtonProps) {
 
     return (
         <PlatformPressable style={globalStyles(theme).backButton} onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name='arrow-left' style={globalStyles(theme).backButtonIcon} />
+            <MaterialCommunityIcons name='chevron-left' style={globalStyles(theme).backButtonIcon} />
         </PlatformPressable>
     );
 }

@@ -53,6 +53,11 @@ type GlobalStyleMap = {
     centerVertical: ViewStyle;
     alignRight: ViewStyle;
     shadow: ViewStyle;
+    chip: ViewStyle;
+    difficultyChipEasy: ViewStyle;
+    difficultyChipMedium: ViewStyle;
+    difficultyChipHard: ViewStyle;
+    reviewChip: ViewStyle;
 };
 
 export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap {
@@ -190,7 +195,7 @@ export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap
         },
         backButtonIcon: {
             color: globalColors(force).text,
-            fontSize: 18
+            fontSize: 24
         },
 
         // toggles
@@ -236,6 +241,29 @@ export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap
             shadowOpacity: 0.25,
             shadowRadius: 10,
             elevation: 5
+        },
+
+        // chips
+        chip: {
+            height: 30,
+            paddingHorizontal: 10,
+            paddingVertical: 5,
+            borderRadius: 20,
+            borderWidth: 2,
+            borderColor: globalColors(force).divider,
+            alignSelf: 'flex-start'
+        },
+        difficultyChipEasy: {
+            borderColor: globalColors(force).greenHighlight
+        },
+        difficultyChipMedium: {
+            borderColor: globalColors(force).orangeHighlight
+        },
+        difficultyChipHard: {
+            borderColor: globalColors(force).redHighlight
+        },
+        reviewChip: {
+            borderColor: globalColors(force).yellowHighlight
         }
     }) as GlobalStyleMap;
 }

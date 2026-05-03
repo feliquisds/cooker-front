@@ -20,6 +20,7 @@ type ProfileNavigation = ScreenNavigation<{
     EditProfile: undefined;
     Accessibility: undefined;
     Recovery: undefined;
+    Favorited: undefined;
 }>;
 
 type ProfileProps = {
@@ -232,7 +233,9 @@ function LoggedInScreen({navigation, setLoggedIn}: ChildProps) {
             </Card>
 
             <Card>
-                <SmallSimpleButton cardItem>Receitas favoritas <MaterialCommunityIcons color={globalColors(theme).redHighlight} name="heart" size={20} /></SmallSimpleButton>
+                <SmallSimpleButton cardItem onPress={() => navigation.navigate('Favorited')}>
+                    Receitas favoritas <MaterialCommunityIcons color={globalColors(theme).redHighlight} name="heart" size={20} />
+                </SmallSimpleButton>
                 <Divider />
                 <SmallSimpleButton cardItem>Meus reviews</SmallSimpleButton>
                 <Divider />
@@ -254,6 +257,7 @@ function LoggedInScreen({navigation, setLoggedIn}: ChildProps) {
 }
 
 export default function Profile({ navigation }: ProfileProps) {
+    const { theme } = useThemeMode();
     const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
     useEffect(() => {
@@ -274,7 +278,7 @@ export default function Profile({ navigation }: ProfileProps) {
         return (
             <SimpleScreen fill>
                 <Section style={{ alignItems: 'center', justifyContent: 'center', height: '100%' }}>
-                    <ActivityIndicator />
+                    <ActivityIndicator color={globalColors(theme).accent[0]} />
                 </Section>
             </SimpleScreen>
         );

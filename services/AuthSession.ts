@@ -6,6 +6,11 @@ const authTokenKey = 'authToken';
 const userIdKey = 'userId';
 const userEmailKey = 'userEmail';
 
+// In-memory cache to avoid repeated SecureStore calls (which can hang on Android)
+let tokenCache: string | null = null;
+let userIdCache: string | null = null;
+let userEmailCache: string | null = null;
+
 function getWebStorage(): Storage | null {
     if (typeof window === 'undefined') {
         return null;
@@ -26,6 +31,14 @@ function secureStoreAvailable(): boolean {
     );
 }
 
+// Helper to wrap SecureStore operations with a timeout to prevent hanging
+async function withTimeout<T>(promise: Promise<T>, timeoutMs: number = 5000): Promise<T | null> {
+    return Promise.race([
+        promise,
+        new Promise<null>(resolve => setTimeout(() => resolve(null), timeoutMs))
+    ]);
+}
+
 async function setValue(key: string, value: string): Promise<void> {
     if (Platform.OS === 'web') {
         getWebStorage()?.setItem(key, value);
@@ -33,7 +46,15 @@ async function setValue(key: string, value: string): Promise<void> {
     }
 
     if (secureStoreAvailable()) {
-        await SecureStore.setItemAsync(key, value);
+        try {
+            await withTimeout(SecureStore.setItemAsync(key, value), 5000);
+            // Update cache on successful write
+            if (key === authTokenKey) tokenCache = value;
+            else if (key === userIdKey) userIdCache = value;
+            else if (key === userEmailKey) userEmailCache = value;
+        } catch (error) {
+            console.warn(`[AuthSession] Failed to set ${key} in SecureStore:`, error);
+        }
     }
 }
 
@@ -42,8 +63,23 @@ async function getValue(key: string): Promise<string | null> {
         return getWebStorage()?.getItem(key) ?? null;
     }
 
+    // Return cached value if available (fast path)
+    if (key === authTokenKey && tokenCache !== undefined) return tokenCache;
+    if (key === userIdKey && userIdCache !== undefined) return userIdCache;
+    if (key === userEmailKey && userEmailCache !== undefined) return userEmailCache;
+
     if (secureStoreAvailable()) {
-        return SecureStore.getItemAsync(key);
+        try {
+            const value = await withTimeout(SecureStore.getItemAsync(key), 5000);
+            // Cache the result
+            if (key === authTokenKey) tokenCache = value;
+            else if (key === userIdKey) userIdCache = value;
+            else if (key === userEmailKey) userEmailCache = value;
+            return value;
+        } catch (error) {
+            console.warn(`[AuthSession] Failed to get ${key} from SecureStore:`, error);
+            return null;
+        }
     }
 
     return null;
@@ -52,11 +88,23 @@ async function getValue(key: string): Promise<string | null> {
 async function deleteValue(key: string): Promise<void> {
     if (Platform.OS === 'web') {
         getWebStorage()?.removeItem(key);
+        // Clear cache
+        if (key === authTokenKey) tokenCache = null;
+        else if (key === userIdKey) userIdCache = null;
+        else if (key === userEmailKey) userEmailCache = null;
         return;
     }
 
     if (secureStoreAvailable()) {
-        await SecureStore.deleteItemAsync(key);
+        try {
+            await withTimeout(SecureStore.deleteItemAsync(key), 5000);
+            // Clear cache on successful delete
+            if (key === authTokenKey) tokenCache = null;
+            else if (key === userIdKey) userIdCache = null;
+            else if (key === userEmailKey) userEmailCache = null;
+        } catch (error) {
+            console.warn(`[AuthSession] Failed to delete ${key} from SecureStore:`, error);
+        }
     }
 }
 
@@ -77,7 +125,16 @@ export async function clearAuthSession(): Promise<void> {
 }
 
 export async function getAuthToken(): Promise<string | null> {
-    return getValue(authTokenKey);
+    try {
+        const token = await getValue(authTokenKey);
+        if (!token) {
+            console.log('[AuthSession] No auth token found');
+        }
+        return token;
+    } catch (error) {
+        console.error('[AuthSession] Error getting auth token:', error);
+        return null;
+    }
 }
 
 export async function getAuthenticatedUserId(): Promise<string | null> {

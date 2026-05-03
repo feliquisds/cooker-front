@@ -12,6 +12,7 @@ import Search from '../screens/Search';
 import Profile from '../screens/Profile';
 import Saved from '../screens/Saved';
 import Home from '../screens/Home';
+import Favorited from '../screens/Favorited';
 
 type RootStackParamList = {
     Tabs: undefined;
@@ -21,6 +22,7 @@ type RootStackParamList = {
     Saved: undefined;
     Search: undefined;
     Profile: undefined;
+    Favorited: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -46,6 +48,7 @@ export default function StackNavigator() {
                         <Stack.Screen name='Saved' component={Saved} />
                         <Stack.Screen name='Search' component={Search} />
                         <Stack.Screen name='Profile' component={Profile} />
+                        <Stack.Screen name='Favorited' component={Favorited} />
                     </Stack.Navigator>
                 </NavigationContainer>
             </SafeAreaView>

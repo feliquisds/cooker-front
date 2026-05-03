@@ -23,4 +23,8 @@ export default class RecipeService {
             { title, tags: tags.join(','), difficulty, authorHandle }
         );
     }
+
+    async getMyFavoriteRecipes(): Promise<Recipe[]> {
+        return this.#adapter.get<Recipe[]>('/favorited');
+    }
 }

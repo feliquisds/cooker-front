@@ -11,13 +11,19 @@ type ThemeColors = {
     inactive: string;
     accent: Gradient;
     redHighlight: string;
+    greenHighlight: string;
+    orangeHighlight: string;
+    yellowHighlight: string;
     buttonText: string;
     shadow: string;
 };
 
-const fixedColors: Pick<ThemeColors, 'accent' | 'redHighlight' | 'buttonText'> = {
+const fixedColors: Pick<ThemeColors, 'accent' | 'redHighlight' | 'greenHighlight' | 'orangeHighlight' | 'yellowHighlight' | 'buttonText'> = {
     accent: ['#FF5E19', '#FFB074'],
     redHighlight: '#EF3E59',
+    greenHighlight: '#4CAF50',
+    orangeHighlight: '#FF9800',
+    yellowHighlight: '#FFEB3B',
     buttonText: '#FFFFFF'
 };
 

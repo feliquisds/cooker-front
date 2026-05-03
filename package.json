@@ -16,6 +16,7 @@
     "@react-navigation/native": "*",
     "@react-navigation/stack": "*",
     "axios": "^1.13.2",
+    "expo-blur": "~15.0.8",
     "expo-constants": "~17.1.7",
     "expo-linear-gradient": "~14.1.5",
     "expo-status-bar": "~2.2.3",

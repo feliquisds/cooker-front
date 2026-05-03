@@ -50,13 +50,11 @@ export default function Recovery({ navigation }: RecoveryProps) {
                         <Divider />
                     </Section>
 
-                    <CardElement>
-                        <Input
-                            placeholder='Email'
-                            value={getEmail}
-                            onChangeText={(value) => setEmail(value)}
-                        />
-                    </CardElement>
+                    <Input
+                        placeholder='Email'
+                        value={getEmail}
+                        onChangeText={(value) => setEmail(value)}
+                    />
                 </Card>
 
                 <BigAccentButton onPress={() => processRecovery(navigation, changeShowActivityIndicator, getEmail)}>

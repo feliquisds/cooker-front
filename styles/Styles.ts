@@ -33,9 +33,9 @@ type GlobalStyleMap = {
     staticArea: ViewStyle;
     screen: ViewStyle;
     input: TextStyle;
-    roundInput: TextStyle;
     divider: ViewStyle;
     tabBar: ViewStyle;
+    tabBarContent: ViewStyle;
     tabBarEntry: ViewStyle;
     card: ViewStyle;
     card_element: ViewStyle;
@@ -52,6 +52,7 @@ type GlobalStyleMap = {
     horizontal: ViewStyle;
     centerVertical: ViewStyle;
     alignRight: ViewStyle;
+    shadow: ViewStyle;
 };
 
 export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap {
@@ -96,16 +97,13 @@ export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap
             backgroundColor: globalColors(force).background
         },
         input: {
+            flex: 1,
             color: globalColors(force).text,
-            fontSize: globalStyleVariables.text
-        },
-        roundInput: {
             fontSize: globalStyleVariables.text,
-            borderColor: globalColors(force).divider,
-            borderWidth: 1,
             borderRadius: 30,
-            height: 50,
-            paddingHorizontal: 15
+            width: '100%' as any,
+            padding: 15,
+            paddingHorizontal: 20
         },
         divider: {
             marginTop: 0,
@@ -124,8 +122,12 @@ export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap
             right: 0,
             position: 'absolute',
             borderRadius: 50,
-            alignItems: 'center',
             backgroundColor: globalColors(force).navigation,
+        },
+        tabBarContent: {
+            height: 66,
+            width: '100%',
+            borderRadius: 50,
             gap: 3
         },
         tabBarEntry: {
@@ -225,5 +227,14 @@ export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap
             alignItems: 'flex-end',
             alignSelf: 'flex-end'
         },
+
+        // shadow
+        shadow: {
+            shadowColor: globalColors(force).shadow,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.25,
+            shadowRadius: 10,
+            elevation: 5
+        }
     }) as GlobalStyleMap;
 }

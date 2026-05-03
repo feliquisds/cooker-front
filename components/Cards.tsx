@@ -12,14 +12,15 @@ type CardProps = {
     style?: StyleProp<ViewStyle>;
     subtitleStyle?: StyleProp<ViewStyle>;
     gap?: number;
+    horizontal?: boolean;
     label?: string;
 };
 
-export function Card({ children, style, subtitleStyle, gap, label }: CardProps) {
+export function Card({ children, style, subtitleStyle, gap, horizontal, label }: CardProps) {
     return (
         <Section gap={5}>
             {label && <Subtext style={[globalStyles().textHorizontalMargins, subtitleStyle]}>{label}</Subtext>}
-            <Section style={[globalStyles().card, style]} gap={gap}>
+            <Section style={[globalStyles().card, style]} gap={gap} horizontal={horizontal}>
                 {children}
             </Section>
         </Section>

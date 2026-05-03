@@ -46,26 +46,22 @@ export default function Login({ navigation }: { navigation: LoginNavigation }) {
                     <Title>Acesse sua conta</Title>
 
                     <Card>
-                        <CardElement>
-                            <Input
-                                placeholder='Email'
-                                value={getEmail}
-                                onChangeText={(value) => setEmail(value)}
-                                autoCapitalize='none'
-                                keyboardType='email-address'
-                            />
-                        </CardElement>
+                        <Input
+                            placeholder='Email'
+                            value={getEmail}
+                            onChangeText={(value) => setEmail(value)}
+                            autoCapitalize='none'
+                            keyboardType='email-address'
+                        />
 
                         <Divider />
 
-                        <CardElement>
-                            <Input
-                                placeholder='Senha'
-                                secureTextEntry={true}
-                                value={getPass}
-                                onChangeText={(value) => setPass(value)}
-                            />
-                        </CardElement>
+                        <Input
+                            placeholder='Senha'
+                            secureTextEntry={true}
+                            value={getPass}
+                            onChangeText={(value) => setPass(value)}
+                        />
                     </Card>
 
                     <SmallSimpleButton style={{ marginHorizontal: globalStyleVariables.screenMargin }} onPress={() => navigation.navigate('Recovery')}>

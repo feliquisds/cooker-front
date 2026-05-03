@@ -1,9 +1,10 @@
-import { Section } from './Alignments';
-import { Subtext } from './Texts';
 import globalColors from '../styles/Colors';
-import globalStyles, { globalStyleVariables } from '../styles/Styles';
+import globalStyles from '../styles/Styles';
 import { TextInput } from 'react-native';
-import type { StyleProp, ViewStyle } from 'react-native';
+import { useThemeMode } from '../styles/ThemeProvider';
+import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
+import { useState } from 'react';
+import { BlurSurface } from './Interface';
 
 type InputProps = {
     style?: StyleProp<ViewStyle>;
@@ -19,12 +20,13 @@ type InputProps = {
 };
 
 export function Input({ style, placeholder, placeholderTextColor = null, value, onChangeText, secureTextEntry, editable, autoCapitalize, keyboardType, big }: InputProps) {
-    const defaultPlaceholderTextColor = globalColors().subtext;
+    const { theme } = useThemeMode();
+    const defaultPlaceholderTextColor = globalColors(theme).subtext;
     const resolvedPlaceholderTextColor = placeholderTextColor == null ? defaultPlaceholderTextColor : placeholderTextColor;
 
     return (
         <TextInput
-            style={[globalStyles().input, big ? { fontSize: globalStyleVariables.header } : {}, style]}
+            style={[globalStyles(theme).input, big ? globalStyles(theme).header : {}, style]}
             placeholder={placeholder}
             placeholderTextColor={resolvedPlaceholderTextColor}
             secureTextEntry={secureTextEntry}
@@ -37,29 +39,33 @@ export function Input({ style, placeholder, placeholderTextColor = null, value, 
     );
 }
 
-type RoundInputProps = Omit<InputProps, 'big'> & {
-    editable?: boolean;
-    label?: string;
-};
+export function SearchBox({ style, placeholder, placeholderTextColor = null, value, onChangeText, editable }: InputProps) {
+    const { theme } = useThemeMode();
+    const themedColors = globalColors(theme);
+    const [searchValue, setSearchValue] = useState('');
 
-export function RoundInput({ style, placeholder, placeholderTextColor = null, value, onChangeText, secureTextEntry, editable = true, label }: RoundInputProps) {
-    const defaultPlaceholderTextColor = globalColors().subtext;
-    const activeTextColor = globalColors().text;
-    const inactiveTextColor = globalColors().subtext;
-    const resolvedPlaceholderTextColor = placeholderTextColor == null ? defaultPlaceholderTextColor : placeholderTextColor;
+    const inputStyle: TextStyle = {
+        textAlign: searchValue ? 'left' : 'center'
+    };
 
     return (
-        <Section gap={5}>
-            <Subtext>{label}</Subtext>
-            <TextInput
-                style={[globalStyles().roundInput, { color: editable ? activeTextColor : inactiveTextColor }, style]}
-                placeholder={placeholder}
-                placeholderTextColor={resolvedPlaceholderTextColor}
-                secureTextEntry={secureTextEntry}
+        <BlurSurface
+            intensity={35}
+            style={[globalStyles(theme).shadow, { backgroundColor: themedColors.navigation, borderRadius: 30 }]}
+        >
+            <Input
+                style={[inputStyle, style]}
+                placeholder={placeholder || "Pesquisar"}
+                placeholderTextColor={placeholderTextColor || themedColors.inactive}
                 value={value}
-                onChangeText={onChangeText}
+                onChangeText={(value) => {
+                    setSearchValue(value);
+                    onChangeText && onChangeText(value);
+                }}
                 editable={editable}
+                autoCapitalize='sentences'
+                keyboardType='default'
             />
-        </Section>
+        </BlurSurface>
     );
 }

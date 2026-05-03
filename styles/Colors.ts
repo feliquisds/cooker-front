@@ -12,6 +12,7 @@ type ThemeColors = {
     accent: Gradient;
     redHighlight: string;
     buttonText: string;
+    shadow: string;
 };
 
 const fixedColors: Pick<ThemeColors, 'accent' | 'redHighlight' | 'buttonText'> = {
@@ -28,6 +29,7 @@ const lightColors: ThemeColors = {
     subtext: '#6E6E73',
     navigation: '#FFFFFF66',
     inactive: '#C3C3CF',
+    shadow: '#000',
     ...fixedColors
 };
 
@@ -39,6 +41,7 @@ const darkColors: ThemeColors = {
     subtext: '#949498',
     navigation: '#15151766',
     inactive: '#646468',
+    shadow: '#000',
     ...fixedColors
 };
 
@@ -53,6 +56,7 @@ export default function globalColors(force: ThemeMode | '' = ''): ThemeColors {
         subtext: theme === 'dark' ? darkColors.subtext : lightColors.subtext,
         navigation: theme === 'dark' ? darkColors.navigation : lightColors.navigation,
         inactive: theme === 'dark' ? darkColors.inactive : lightColors.inactive,
+        shadow: theme === 'dark' ? darkColors.shadow : lightColors.shadow,
         ...fixedColors
     };
 }

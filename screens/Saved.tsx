@@ -1,10 +1,9 @@
 import { FlatList, type ListRenderItem } from 'react-native';
 import { Divider, SimpleScreen } from '../components/Interface';
 import { Header, Title, Text, Subtext } from '../components/Texts';
-import { Card, CardElement, GradientCard } from '../components/Cards';
-import { SlimSimpleButton, SmallAccentButton } from '../components/Buttons';
+import { Card, CardElement } from '../components/Cards';
+import { SmallAccentButton } from '../components/Buttons';
 import { Section } from '../components/Alignments';
-import globalColors from '../styles/Colors';
 import type { ScreenNavigation } from '../components/Types';
 
 type ReportItem = {

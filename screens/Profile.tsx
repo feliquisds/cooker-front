@@ -1,6 +1,6 @@
 import { Header, Subtext, Title, Text } from '../components/Texts';
 import { SimpleScreen, Divider } from '../components/Interface';
-import { ActivityIndicator, Image, StyleSheet } from 'react-native';
+import { ActivityIndicator, Image, Linking, Platform, StyleSheet } from 'react-native';
 import { Card, CardElement } from '../components/Cards';
 import { BigAccentButton, SmallAccentButton, SmallSimpleButton } from '../components/Buttons';
 import { Section } from '../components/Alignments';
@@ -66,7 +66,33 @@ function handleLogout(setLoggedIn: (value: boolean) => void) {
     setLoggedIn(false);
 }
 
-function AccessibilityAndToggles({children}: {children?: React.ReactNode}) {
+async function openSystemAccessibility(): Promise<void> {
+    const isWindowsWeb = Platform.OS === 'web'
+        && typeof navigator !== 'undefined'
+        && /Windows/i.test(navigator.userAgent);
+
+    try {
+        if (Platform.OS === 'android' && typeof Linking.sendIntent === 'function') {
+            await Linking.sendIntent('android.settings.ACCESSIBILITY_SETTINGS');
+            return;
+        }
+
+        if ((Platform.OS as string) === 'windows' || isWindowsWeb) {
+            const windowsSettingsUris = 'ms-settings:easeofaccess';
+            await Linking.openURL(windowsSettingsUris);
+            return;
+        }
+
+        if (Platform.OS === 'ios') {
+            await Linking.openSettings();
+            return;
+        }
+    } catch {
+        // Fallback below
+    }
+}
+
+function AccessibilityAndToggles({ children }: { children?: React.ReactNode }) {
     const { theme, selection, setTheme } = useThemeMode();
 
     function changeTheme(isDarkMode: boolean) {
@@ -80,7 +106,7 @@ function AccessibilityAndToggles({children}: {children?: React.ReactNode}) {
 
     return (
         <Card>
-            <SmallSimpleButton cardItem onPress={() => navigation.navigate('Accessibility')}>Acessibilidade</SmallSimpleButton>
+            <SmallSimpleButton cardItem onPress={() => void openSystemAccessibility()}>Acessibilidade</SmallSimpleButton>
             <Divider />
             <CardElement horizontal spaceBetween>
                 <Text>Tema do sistema</Text>
@@ -145,7 +171,7 @@ function LoggedOutScreen({ navigation, setLoggedIn }: ChildProps) {
                     <SmallAccentButton>Crie uma nova conta</SmallAccentButton>
                 </Section>
 
-                {AccessibilityAndToggles({children: undefined})}
+                <AccessibilityAndToggles />
             </Section>
         </SimpleScreen>
     );
@@ -184,18 +210,16 @@ function LoggedInScreen({navigation, setLoggedIn}: ChildProps) {
                 <SmallSimpleButton cardItem>Meus pedidos</SmallSimpleButton>
             </Card>
 
-            {AccessibilityAndToggles({
-                children: (
-                    <>
-                        <Divider />
-                        <CardElement>
-                            <SmallSimpleButton style={{ color: globalColors(theme).redHighlight, textAlign: 'center' }} onPress={() => handleLogout(setLoggedIn)}>
-                                Sair <MaterialCommunityIcons name='logout' size={20} />
-                            </SmallSimpleButton>
-                        </CardElement>
-                    </>
-                )
-            })}
+            <AccessibilityAndToggles>
+                <>
+                    <Divider />
+                    <CardElement>
+                        <SmallSimpleButton style={{ color: globalColors(theme).redHighlight, textAlign: 'center' }} onPress={() => handleLogout(setLoggedIn)}>
+                            Sair <MaterialCommunityIcons name='logout' size={20} />
+                        </SmallSimpleButton>
+                    </CardElement>
+                </>
+            </AccessibilityAndToggles>
         </SimpleScreen>
     );
 }

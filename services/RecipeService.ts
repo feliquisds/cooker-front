@@ -1,50 +1,27 @@
-import { AxiosInstance } from 'axios';
-import APIService from './APIService';
+import APIAdapter from '../utils/APIAdapter';
 import { Recipe } from '../model/Recipe';
 import { Difficulty } from '../model/Difficulty';
 
 export default class RecipeService {
-    #api: AxiosInstance;
-    #apiService: APIService;
+    #adapter: APIAdapter;
 
     constructor() {
-        this.#apiService = new APIService('recipes');
-        this.#api = this.#apiService.getApi();
+        this.#adapter = new APIAdapter('recipes');
     }
 
     async getRecipeById(recipeId: string): Promise<Recipe> {
-        try {
-            const response = await this.#api.get(`/${recipeId}`);
-            return response.data;
-        } catch (error) {
-            throw new Error('Erro ao buscar receita: ' + error);
-        }
+        return this.#adapter.get<Recipe>(`/${recipeId}`);
     }
 
     async createRecipe(recipeData: Partial<Recipe>, userId: string): Promise<Recipe> {
-        try {
-            const response = await this.#api.post(
-                '/',
-                recipeData,
-                {
-                    headers: { [this.#apiService.getUserHeader()]: userId } 
-                });
-            return response.data;
-        } catch (error) {
-            throw new Error('Erro ao criar receita: ' + error);
-        }
+        return this.#adapter.post<Recipe>('/', recipeData, userId);
     }
 
     async searchRecipes(title: string, tags: string[], difficulty: Difficulty, authorHandle: string): Promise<Recipe[]> {
-        try {
-            const response = await this.#api.get(
-                '/search',
-                {
-                    params: { title, tags: tags.join(','), difficulty, authorHandle }
-                });
-            return response.data;
-        } catch (error) {
-            throw new Error('Erro ao buscar receitas: ' + error);
-        }
+        return this.#adapter.get<Recipe[]>(
+            '/search',
+            undefined,
+            { title, tags: tags.join(','), difficulty, authorHandle }
+        );
     }
 }

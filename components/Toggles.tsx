@@ -6,6 +6,7 @@ import { GradientCard } from './Cards';
 import type { Gradient } from './Types';
 import globalStyles from '../styles/Styles';
 import globalColors from '../styles/Colors';
+import { useThemeMode } from '../styles/ThemeProvider';
 
 type AccentToggleProps = {
     value: boolean;
@@ -15,9 +16,10 @@ type AccentToggleProps = {
 
 export function AccentToggle(props: AccentToggleProps) {
     const { value, onValueChange, disabled } = props;
+    const { theme } = useThemeMode();
     const [animatedValue] = useState(new Animated.Value(value ? 1 : 0));
-    const inactive = globalColors().inactive;
-    const accent = globalColors().accent;
+    const inactive = globalColors(theme).inactive;
+    const accent = globalColors(theme).accent;
     const currentBg: Gradient = value ? accent : [inactive, inactive] as Gradient;
 
     const translateX = animatedValue.interpolate({
@@ -41,9 +43,9 @@ export function AccentToggle(props: AccentToggleProps) {
 
     return (
         <PlatformPressable onPress={toggleSwitch} disabled={disabled}>
-            <GradientCard gradient={currentBg} style={globalStyles().toggle}>
+            <GradientCard gradient={currentBg} style={globalStyles(theme).toggle}>
                 <Animated.View style={{ transform: [{ translateX }] }}>
-                    <Section style={globalStyles().toggleButton} />
+                    <Section style={globalStyles(theme).toggleButton} />
                 </Animated.View>
             </GradientCard>
         </PlatformPressable>

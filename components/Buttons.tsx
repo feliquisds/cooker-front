@@ -6,6 +6,7 @@ import { Text, GradientText } from './Texts';
 import type { Gradient } from './Types';
 import globalStyles from '../styles/Styles';
 import globalColors from '../styles/Colors';
+import { useThemeMode } from '../styles/ThemeProvider';
 
 type ButtonProps = {
     children?: ReactNode;
@@ -15,48 +16,52 @@ type ButtonProps = {
 };
 
 export function BigSimpleButton({ children, onPress, gradient = null }: ButtonProps) {
-    const defaultGradient = globalColors().accent;
+    const { theme } = useThemeMode();
+    const defaultGradient = globalColors(theme).accent;
     const resolvedGradient = gradient == null ? defaultGradient : gradient;
 
     return (
-        <PlatformPressable style={globalStyles().bigButton} onPress={onPress}>
+        <PlatformPressable style={globalStyles(theme).bigButton} onPress={onPress}>
             <GradientText accented gradient={resolvedGradient}>{children}</GradientText>
         </PlatformPressable>
     );
 }
 
 export function BigAccentButton({ children, onPress, gradient = null }: ButtonProps) {
-    const defaultGradient = globalColors().accent;
+    const { theme } = useThemeMode();
+    const defaultGradient = globalColors(theme).accent;
     const resolvedGradient = gradient == null ? defaultGradient : gradient;
 
     return (
         <PlatformPressable onPress={onPress}>
-            <LinearGradient style={globalStyles().bigButton} colors={resolvedGradient}>
-                <Text accented style={{ color: globalColors().buttonText }}>{children}</Text>
+            <LinearGradient style={globalStyles(theme).bigButton} colors={resolvedGradient}>
+                <Text accented style={{ color: globalColors(theme).buttonText }}>{children}</Text>
             </LinearGradient>
         </PlatformPressable>
     );
 }
 
 export function SlimSimpleButton({ children, onPress, gradient = null }: ButtonProps) {
-    const defaultGradient = globalColors().accent;
+    const { theme } = useThemeMode();
+    const defaultGradient = globalColors(theme).accent;
     const resolvedGradient = gradient == null ? defaultGradient : gradient;
 
     return (
-        <PlatformPressable style={globalStyles().slimButton} onPress={onPress}>
+        <PlatformPressable style={globalStyles(theme).slimButton} onPress={onPress}>
             <GradientText accented gradient={resolvedGradient}>{children}</GradientText>
         </PlatformPressable>
     );
 }
 
 export function SlimAccentButton({ children, onPress, gradient = null }: ButtonProps) {
-    const defaultGradient = globalColors().accent;
+    const { theme } = useThemeMode();
+    const defaultGradient = globalColors(theme).accent;
     const resolvedGradient = gradient == null ? defaultGradient : gradient;
 
     return (
         <PlatformPressable onPress={onPress}>
-            <LinearGradient style={globalStyles().slimButton} colors={resolvedGradient}>
-                <Text accented style={{ color: globalColors().buttonText }}>{children}</Text>
+            <LinearGradient style={globalStyles(theme).slimButton} colors={resolvedGradient}>
+                <Text accented style={{ color: globalColors(theme).buttonText }}>{children}</Text>
             </LinearGradient>
         </PlatformPressable>
     );
@@ -65,13 +70,14 @@ export function SlimAccentButton({ children, onPress, gradient = null }: ButtonP
 export function SmallSimpleButton({ children, onPress, style }: ButtonProps) {
     return (
         <PlatformPressable onPress={onPress}>
-            <Text accented style={style}>{children}</Text>
+            <Text style={style}>{children}</Text>
         </PlatformPressable>
     );
 }
 
 export function SmallAccentButton({ children, onPress, style, gradient = null }: ButtonProps) {
-    const defaultGradient = globalColors().accent;
+    const { theme } = useThemeMode();
+    const defaultGradient = globalColors(theme).accent;
     const resolvedGradient = gradient == null ? defaultGradient : gradient;
 
     return (

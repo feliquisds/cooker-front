@@ -6,6 +6,7 @@ import { Section } from './Alignments';
 import type { Gradient } from './Types';
 import globalStyles from '../styles/Styles';
 import globalColors from '../styles/Colors';
+import { useThemeMode } from '../styles/ThemeProvider';
 
 type TextProps = {
     children?: ReactNode;
@@ -20,7 +21,8 @@ type GradientTextProps = TextProps & {
 };
 
 export function Title({ children, style }: TextProps) {
-    return <ReactText style={[globalStyles().title, globalStyles().textHorizontalMargins, style]}>{children}</ReactText>;
+    const { theme } = useThemeMode();
+    return <ReactText style={[globalStyles(theme).title, globalStyles(theme).textHorizontalMargins, style]}>{children}</ReactText>;
 }
 
 type TitleWithBackButtonProps = TextProps & {
@@ -28,21 +30,24 @@ type TitleWithBackButtonProps = TextProps & {
 };
 
 export function TitleWithBackButton({ children, style, navigation }: TitleWithBackButtonProps) {
+    const { theme } = useThemeMode();
+
     return (
         <Section horizontal gap={10}>
             <BackButton navigation={navigation} />
-            <ReactText style={[globalStyles().title, style]}>{children}</ReactText>
+            <ReactText style={[globalStyles(theme).title, style]}>{children}</ReactText>
         </Section>
     );
 }
 
 export function Header({ children, style, accented, centerVertical, alignRight }: TextProps) {
-    const accentedStyle = globalStyles().accentedText;
+    const { theme } = useThemeMode();
+    const accentedStyle = globalStyles(theme).accentedText;
 
     return (
         <ReactText
             style={[
-                globalStyles().header,
+                globalStyles(theme).header,
                 style,
                 accented ? accentedStyle : {},
                 centerVertical ? { textAlignVertical: 'center' } : {},
@@ -55,12 +60,13 @@ export function Header({ children, style, accented, centerVertical, alignRight }
 }
 
 export function Text({ children, style, accented, centerVertical, alignRight }: TextProps) {
-    const accentedStyle = globalStyles().accentedText;
+    const { theme } = useThemeMode();
+    const accentedStyle = globalStyles(theme).accentedText;
 
     return (
         <ReactText
             style={[
-                globalStyles().text,
+                globalStyles(theme).text,
                 style,
                 accented ? accentedStyle : {},
                 centerVertical ? { textAlignVertical: 'center' } : {},
@@ -73,12 +79,13 @@ export function Text({ children, style, accented, centerVertical, alignRight }: 
 }
 
 export function Subtext({ children, style, accented, centerVertical, alignRight }: TextProps) {
-    const accentedStyle = globalStyles().accentedText;
+    const { theme } = useThemeMode();
+    const accentedStyle = globalStyles(theme).accentedText;
 
     return (
         <ReactText
             style={[
-                globalStyles().subtext,
+                globalStyles(theme).subtext,
                 style,
                 accented ? accentedStyle : {},
                 centerVertical ? { textAlignVertical: 'center' } : {},
@@ -91,14 +98,15 @@ export function Subtext({ children, style, accented, centerVertical, alignRight 
 }
 
 export function GradientHeader({ children, gradient = null, style, accented, centerVertical, alignRight }: GradientTextProps) {
-    const accentedStyle = globalStyles().accentedText;
-    const defaultGradient = globalColors().accent;
+    const { theme } = useThemeMode();
+    const accentedStyle = globalStyles(theme).accentedText;
+    const defaultGradient = globalColors(theme).accent;
     const resolvedGradient = gradient == null ? defaultGradient : gradient;
 
     return (
         <ReactGradientText
             style={[
-                globalStyles().header,
+                globalStyles(theme).header,
                 style,
                 accented ? accentedStyle : {},
                 centerVertical ? { textAlignVertical: 'center' } : {},
@@ -112,14 +120,15 @@ export function GradientHeader({ children, gradient = null, style, accented, cen
 }
 
 export function GradientText({ children, gradient = null, style, accented, centerVertical, alignRight }: GradientTextProps) {
-    const accentedStyle = globalStyles().accentedText;
-    const defaultGradient = globalColors().accent;
+    const { theme } = useThemeMode();
+    const accentedStyle = globalStyles(theme).accentedText;
+    const defaultGradient = globalColors(theme).accent;
     const resolvedGradient = gradient == null ? defaultGradient : gradient;
 
     return (
         <ReactGradientText
             style={[
-                globalStyles().text,
+                globalStyles(theme).text,
                 style,
                 accented ? accentedStyle : {},
                 centerVertical ? { textAlignVertical: 'center' } : {},
@@ -133,14 +142,15 @@ export function GradientText({ children, gradient = null, style, accented, cente
 }
 
 export function GradientSubtext({ children, gradient = null, style, accented, centerVertical, alignRight }: GradientTextProps) {
-    const accentedStyle = globalStyles().accentedText;
-    const defaultGradient = globalColors().accent;
+    const { theme } = useThemeMode();
+    const accentedStyle = globalStyles(theme).accentedText;
+    const defaultGradient = globalColors(theme).accent;
     const resolvedGradient = gradient == null ? defaultGradient : gradient;
 
     return (
         <ReactGradientText
             style={[
-                globalStyles().subtext,
+                globalStyles(theme).subtext,
                 style,
                 accented ? accentedStyle : {},
                 centerVertical ? { textAlignVertical: 'center' } : {},

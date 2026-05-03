@@ -6,6 +6,7 @@ import { getGap, Section } from './Alignments';
 import type { Gradient } from './Types';
 import globalStyles from '../styles/Styles';
 import globalColors from '../styles/Colors';
+import { useThemeMode } from '../styles/ThemeProvider';
 
 type CardProps = {
     children?: ReactNode;
@@ -17,10 +18,12 @@ type CardProps = {
 };
 
 export function Card({ children, style, subtitleStyle, gap, horizontal, label }: CardProps) {
+    const { theme } = useThemeMode();
+
     return (
         <Section gap={5}>
-            {label && <Subtext style={[globalStyles().textHorizontalMargins, subtitleStyle]}>{label}</Subtext>}
-            <Section style={[globalStyles().card, style]} gap={gap} horizontal={horizontal}>
+            {label && <Subtext style={[globalStyles(theme).textHorizontalMargins, subtitleStyle]}>{label}</Subtext>}
+            <Section style={[globalStyles(theme).card, style]} gap={gap} horizontal={horizontal}>
                 {children}
             </Section>
         </Section>
@@ -37,11 +40,12 @@ type GradientCardProps = {
 };
 
 export function GradientCard({ children, style, gradient = null, gap, start, end }: GradientCardProps) {
-    const defaultGradient = globalColors().accent;
+    const { theme } = useThemeMode();
+    const defaultGradient = globalColors(theme).accent;
     const resolvedGradient = gradient == null ? defaultGradient : gradient;
 
     return (
-        <LinearGradient style={[globalStyles().card, style, getGap(gap)]} colors={resolvedGradient} start={start} end={end}>
+        <LinearGradient style={[globalStyles(theme).card, style, getGap(gap)]} colors={resolvedGradient} start={start} end={end}>
             {children}
         </LinearGradient>
     );
@@ -57,9 +61,11 @@ type CardElementProps = {
 };
 
 export function CardElement({ children, style, gap, horizontal, spaceBetween, centerVertical }: CardElementProps) {
+    const { theme } = useThemeMode();
+
     return (
         <Section
-            style={[globalStyles().card_element, style]}
+            style={[globalStyles(theme).card_element, style]}
             gap={gap}
             horizontal={horizontal}
             spaceBetween={spaceBetween}

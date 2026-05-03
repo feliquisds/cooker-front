@@ -18,12 +18,14 @@ type ScreenProps = {
 };
 
 export function SimpleScreen({ children, style, containerStyle, fill, scrollPadding, tabScreen }: ScreenProps) {
-    const scrollPaddingStyle = globalStyles().scrollPadding;
-    const tabScreenPaddingStyle = globalStyles().tabScreenPadding;
+    const { theme } = useThemeMode();
+    const styles = globalStyles(theme);
+    const scrollPaddingStyle = styles.scrollPadding;
+    const tabScreenPaddingStyle = styles.tabScreenPadding;
 
     return (
         <ScrollView
-            style={[globalStyles().screen, style]}
+            style={[styles.screen, style]}
             contentContainerStyle={[
                 getGap(15),
                 containerStyle,
@@ -43,13 +45,15 @@ type ImageScreenProps = ScreenProps & {
 };
 
 export function ImageScreen({ children, style, containerStyle, fill, scrollPadding, tabScreen, source, resizeMode = 'cover' }: ImageScreenProps) {
-    const scrollPaddingStyle = globalStyles().scrollPadding;
-    const tabScreenPaddingStyle = globalStyles().tabScreenPadding;
+    const { theme } = useThemeMode();
+    const styles = globalStyles(theme);
+    const scrollPaddingStyle = styles.scrollPadding;
+    const tabScreenPaddingStyle = styles.tabScreenPadding;
 
     return (
-        <ImageBackground source={source} resizeMode={resizeMode} style={[globalStyles().staticArea, { width: '100%', height: '100%' }]}>
+        <ImageBackground source={source} resizeMode={resizeMode} style={[styles.staticArea, { width: '100%', height: '100%' }]}>
             <ScrollView
-                style={[globalStyles().scrollArea, style]}
+            style={[styles.scrollArea, style]}
                 contentContainerStyle={[
                     getGap(15),
                     containerStyle,
@@ -65,7 +69,8 @@ export function ImageScreen({ children, style, containerStyle, fill, scrollPaddi
 }
 
 export function Divider({ style }: { style?: StyleProp<ViewStyle> }) {
-    return <View style={[globalStyles().divider, style]} />;
+    const { theme } = useThemeMode();
+    return <View style={[globalStyles(theme).divider, style]} />;
 }
 
 type BackButtonProps = {
@@ -73,9 +78,11 @@ type BackButtonProps = {
 };
 
 export function BackButton({ navigation }: BackButtonProps) {
+    const { theme } = useThemeMode();
+
     return (
-        <PlatformPressable style={globalStyles().backButton} onPress={() => navigation.goBack()}>
-            <MaterialCommunityIcons name='arrow-left' style={globalStyles().backButtonIcon} />
+        <PlatformPressable style={globalStyles(theme).backButton} onPress={() => navigation.goBack()}>
+            <MaterialCommunityIcons name='arrow-left' style={globalStyles(theme).backButtonIcon} />
         </PlatformPressable>
     );
 }

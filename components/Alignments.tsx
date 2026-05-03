@@ -1,6 +1,7 @@
 import { ReactNode } from 'react';
 import { View, type StyleProp, type ViewStyle } from 'react-native';
 import globalStyles from '../styles/Styles';
+import { useThemeMode } from '../styles/ThemeProvider';
 
 export function getGap(gap?: number): ViewStyle {
     if (gap == 15) return { gap: 15 };
@@ -20,10 +21,12 @@ type SectionProps = {
 };
 
 export function Section({ children, gap, spaceBetween, horizontal, centerVertical, alignRight, style }: SectionProps) {
-    const spaceBetweenStyle = globalStyles().space_between;
-    const horizontalStyle = globalStyles().horizontal;
-    const centerVerticalStyle = globalStyles().centerVertical;
-    const alignRightStyle = globalStyles().alignRight;
+    const { theme } = useThemeMode();
+    const styles = globalStyles(theme);
+    const spaceBetweenStyle = styles.space_between;
+    const horizontalStyle = styles.horizontal;
+    const centerVerticalStyle = styles.centerVertical;
+    const alignRightStyle = styles.alignRight;
 
     return (
         <View

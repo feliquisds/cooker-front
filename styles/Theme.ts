@@ -1,15 +1,22 @@
 import { Appearance, Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 export type ThemeSelection = 'light' | 'dark' | 'system';
 export type ThemeMode = 'light' | 'dark';
 
 const storageKey = 'cooker.theme';
 
+function toThemeSelection(value: string | null): ThemeSelection | null {
+    if (value === 'light' || value === 'dark' || value === 'system') {
+        return value;
+    }
+    return null;
+}
+
 function readStoredSelection(): ThemeSelection | null {
     if (typeof window === 'undefined') return null;
     try {
-        const stored = window.localStorage.getItem(storageKey);
-        if (stored === 'light' || stored === 'dark' || stored === 'system') return stored as ThemeSelection;
+        return toThemeSelection(window.localStorage.getItem(storageKey));
     } catch {
         // Ignore localStorage errors
     }
@@ -31,11 +38,36 @@ export function resolveThemeMode(selection: ThemeSelection | '' = ''): ThemeMode
 
 export function setThemeSelection(selection: ThemeSelection): void {
     selectionOverride = selection;
+
     if (Platform.OS === 'web' && typeof window !== 'undefined') {
         window.localStorage.setItem(storageKey, selection);
+        return;
     }
+
+    void AsyncStorage.setItem(storageKey, selection).catch(() => {
+        // Ignore AsyncStorage errors to avoid crashing the UI flow
+    });
 }
 
 export function getThemeSelection(): ThemeSelection {
     return selectionOverride ?? 'system';
+}
+
+export async function hydrateThemeSelection(): Promise<ThemeSelection> {
+    if (Platform.OS === 'web') {
+        const selection = readStoredSelection() ?? selectionOverride ?? 'system';
+        selectionOverride = selection;
+        return selection;
+    }
+
+    try {
+        const stored = await AsyncStorage.getItem(storageKey);
+        const selection = toThemeSelection(stored) ?? selectionOverride ?? 'system';
+        selectionOverride = selection;
+        return selection;
+    } catch {
+        const fallback = selectionOverride ?? 'system';
+        selectionOverride = fallback;
+        return fallback;
+    }
 }

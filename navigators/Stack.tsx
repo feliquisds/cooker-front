@@ -7,7 +7,6 @@ import globalStyles from '../styles/Styles';
 import { useThemeMode } from '../components/ThemeProvider';
 
 import Tabs from './Tabs';
-import Login from '../screens/Login';
 import Recovery from '../screens/Recovery';
 import Search from '../screens/Search';
 import Profile from '../screens/Profile';
@@ -42,7 +41,6 @@ export default function StackNavigator() {
                         }}
                     >
                         <Stack.Screen name='Tabs' component={Tabs} />
-                        <Stack.Screen name='Login' component={Login} />
                         <Stack.Screen name='Recovery' component={Recovery} />
                         <Stack.Screen name='Home' component={Home} />
                         <Stack.Screen name='Saved' component={Saved} />

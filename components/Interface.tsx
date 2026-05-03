@@ -6,7 +6,6 @@ import { PlatformPressable } from '@react-navigation/elements';
 import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
 import { BlurView } from 'expo-blur';
 import { useThemeMode } from './ThemeProvider';
-import globalColors from '../styles/Colors';
 
 type ScreenProps = {
     children?: ReactNode;
@@ -29,7 +28,7 @@ export function SimpleScreen({ children, style, containerStyle, fill, scrollPadd
             contentContainerStyle={[
                 getGap(15),
                 containerStyle,
-                fill ? { height: '100%' } : {},
+                fill ? { flexGrow: 1 } : {},
                 scrollPadding ? scrollPaddingStyle : {},
                 tabScreen ? tabScreenPaddingStyle : {}
             ]}
@@ -57,7 +56,7 @@ export function ImageScreen({ children, style, containerStyle, fill, scrollPaddi
                 contentContainerStyle={[
                     getGap(15),
                     containerStyle,
-                    fill ? { height: '100%' } : {},
+                    fill ? { flexGrow: 1 } : {},
                     scrollPadding ? scrollPaddingStyle : {},
                     tabScreen ? tabScreenPaddingStyle : {}
                 ]}

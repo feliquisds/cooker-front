@@ -4,6 +4,7 @@ import {
     resolveThemeMode,
     getThemeSelection,
     setThemeSelection,
+    hydrateThemeSelection,
     type ThemeSelection,
     type ThemeMode
 } from '../styles/Theme';
@@ -26,6 +27,20 @@ type ThemeProviderProps = {
 export function ThemeProvider({ children }: ThemeProviderProps) {
     const [selection, setSelectionState] = useState<ThemeSelection>(getThemeSelection());
     const [tick, setTick] = useState(0); // used to trigger re-resolve on Appearance change
+
+    useEffect(() => {
+        let mounted = true;
+
+        void hydrateThemeSelection().then((storedSelection) => {
+            if (mounted) {
+                setSelectionState(storedSelection);
+            }
+        });
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
 
     useEffect(() => {
         const sub = Appearance.addChangeListener(() => {

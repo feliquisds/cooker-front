@@ -120,7 +120,7 @@ function AvisoCard({ item }: AvisoCardProps) {
 
 const renderItem: ListRenderItem<NotificationItem> = ({ item }) => <AvisoCard item={item} />;
 
-export default function Notifications() {
+export default function Search() {
     return (
         <SimpleScreen tabScreen>
             <Section gap={15}>

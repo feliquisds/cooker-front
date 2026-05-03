@@ -42,7 +42,7 @@ const renderNote: ListRenderItem<ReportItem> = ({ item }) => (
     </CardElement>
 );
 
-export default function Reports({ navigation }: ReportsProps) {
+export default function Saved({ navigation }: ReportsProps) {
     return (
         <SimpleScreen tabScreen>
             <Title>Relatório</Title>

@@ -5,7 +5,7 @@ import globalStyles from '../styles/Styles';
 import { PlatformPressable } from '@react-navigation/elements';
 import MaterialCommunityIcons from '@expo/vector-icons/build/MaterialCommunityIcons';
 import { BlurView } from 'expo-blur';
-import { useThemeMode } from '../styles/ThemeProvider';
+import { useThemeMode } from './ThemeProvider';
 import globalColors from '../styles/Colors';
 
 type ScreenProps = {

@@ -6,13 +6,15 @@ import { Text, GradientText } from './Texts';
 import type { Gradient } from './Types';
 import globalStyles from '../styles/Styles';
 import globalColors from '../styles/Colors';
-import { useThemeMode } from '../styles/ThemeProvider';
+import { useThemeMode } from './ThemeProvider';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 
 type ButtonProps = {
     children?: ReactNode;
     onPress?: () => void;
     gradient?: Gradient | null;
     style?: StyleProp<TextStyle> | StyleProp<ViewStyle>;
+    cardItem?: boolean;
 };
 
 export function BigSimpleButton({ children, onPress, gradient = null }: ButtonProps) {
@@ -67,22 +69,28 @@ export function SlimAccentButton({ children, onPress, gradient = null }: ButtonP
     );
 }
 
-export function SmallSimpleButton({ children, onPress, style }: ButtonProps) {
+export function SmallSimpleButton({ children, onPress, style, cardItem }: ButtonProps) {
+    const { theme } = useThemeMode();
+    const arrow = <MaterialCommunityIcons name='chevron-right' style={[globalStyles(theme).header, { color: globalColors(theme).subtext }]} />;
+
     return (
-        <PlatformPressable onPress={onPress}>
+        <PlatformPressable onPress={onPress} style={cardItem ? [globalStyles(theme).card_element, { flexDirection: 'row', justifyContent: 'space-between' }] : {}}>
             <Text style={style}>{children}</Text>
+            {cardItem && arrow}
         </PlatformPressable>
     );
 }
 
-export function SmallAccentButton({ children, onPress, style, gradient = null }: ButtonProps) {
+export function SmallAccentButton({ children, onPress, style, gradient = null, cardItem }: ButtonProps) {
     const { theme } = useThemeMode();
     const defaultGradient = globalColors(theme).accent;
     const resolvedGradient = gradient == null ? defaultGradient : gradient;
+    const arrow = <MaterialCommunityIcons name='chevron-right' style={[globalStyles(theme).header, { color: globalColors(theme).accent[0] }]} />;
 
     return (
-        <PlatformPressable onPress={onPress}>
+        <PlatformPressable onPress={onPress} style={cardItem ? [globalStyles(theme).card_element, { flexDirection: 'row', justifyContent: 'space-between' }] : {}}>
             <GradientText accented style={style} gradient={resolvedGradient}>{children}</GradientText>
+            {cardItem && arrow}
         </PlatformPressable>
     );
 }

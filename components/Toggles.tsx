@@ -6,7 +6,7 @@ import { GradientCard } from './Cards';
 import type { Gradient } from './Types';
 import globalStyles from '../styles/Styles';
 import globalColors from '../styles/Colors';
-import { useThemeMode } from '../styles/ThemeProvider';
+import { useThemeMode } from './ThemeProvider';
 
 type AccentToggleProps = {
     value: boolean;

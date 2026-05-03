@@ -6,7 +6,7 @@ import { getGap, Section } from './Alignments';
 import type { Gradient } from './Types';
 import globalStyles from '../styles/Styles';
 import globalColors from '../styles/Colors';
-import { useThemeMode } from '../styles/ThemeProvider';
+import { useThemeMode } from './ThemeProvider';
 
 type CardProps = {
     children?: ReactNode;

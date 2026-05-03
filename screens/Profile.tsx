@@ -5,9 +5,8 @@ import { Card, CardElement } from '../components/Cards';
 import { SmallSimpleButton } from '../components/Buttons';
 import { Section } from '../components/Alignments';
 import { AccentToggle } from '../components/Toggles';
-import { useEffect, useState } from 'react';
 import type { ScreenNavigation } from '../components/Types';
-import { useThemeMode } from '../styles/ThemeProvider';
+import { useThemeMode } from '../components/ThemeProvider';
 import globalColors from '../styles/Colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 
@@ -40,31 +39,16 @@ const DATA = {
 }
 
 export default function Profile({ navigation }: ProfileProps) {
-    const [nome, setNome] = useState('Carregando...');
-    const { theme, setTheme } = useThemeMode();
+    const { theme, selection, setTheme } = useThemeMode();
 
     function changeTheme(isDarkMode: boolean) {
-        if (isDarkMode) {
-            setTheme('dark');
-            console.log('modo escuro ativado');
-        }
-        else {
-            setTheme('light');
-            console.log('modo escuro desativado');
-        }
+        setTheme(isDarkMode ? 'dark' : 'light');
     }
 
-    async function loadName() {
-        try {
-            setNome('test');
-        } catch (error) {
-            console.error('Erro ao carregar perfil: ', error);
-        }
+    function toggleSystemTheme(enabled: boolean) {
+        if (enabled) setTheme('system');
+        else setTheme(theme === 'dark' ? 'dark' : 'light');
     }
-
-    useEffect(() => {
-        loadName();
-    }, []);
 
     return (
         <SimpleScreen tabScreen>
@@ -85,33 +69,32 @@ export default function Profile({ navigation }: ProfileProps) {
                     <Subtext>{DATA.bio}</Subtext>
                 </CardElement>
                 <Divider />
-                <CardElement>
-                    <SmallSimpleButton onPress={() => navigation.navigate('EditProfile')}>Editar informações</SmallSimpleButton>
-                </CardElement>
+                <SmallSimpleButton cardItem onPress={() => navigation.navigate('EditProfile')}>Editar informações</SmallSimpleButton>
             </Card>
 
             <Card>
-                <CardElement>
-                    <SmallSimpleButton>Receitas favoritas <MaterialCommunityIcons color={globalColors(theme).redHighlight} name="heart" size={20} /></SmallSimpleButton>
-                </CardElement>
+                <SmallSimpleButton cardItem>Receitas favoritas <MaterialCommunityIcons color={globalColors(theme).redHighlight} name="heart" size={20} /></SmallSimpleButton>
                 <Divider />
-                <CardElement>
-                    <SmallSimpleButton>Meus reviews</SmallSimpleButton>
-                </CardElement>
+                <SmallSimpleButton cardItem>Meus reviews</SmallSimpleButton>
                 <Divider />
-                <CardElement>
-                    <SmallSimpleButton>Meus pedidos</SmallSimpleButton>
-                </CardElement>
+                <SmallSimpleButton cardItem>Meus pedidos</SmallSimpleButton>
             </Card>
             <Card>
-                <CardElement>
-                    <SmallSimpleButton onPress={() => navigation.navigate('Accessibility')}>Acessibilidade</SmallSimpleButton>
-                </CardElement>
+                <SmallSimpleButton cardItem onPress={() => navigation.navigate('Accessibility')}>Acessibilidade</SmallSimpleButton>
                 <Divider />
                 <CardElement horizontal spaceBetween>
-                    <Text accented>Modo escuro</Text>
-                    <AccentToggle value={theme === 'dark'} onValueChange={changeTheme} />
+                    <Text>Tema do sistema</Text>
+                    <AccentToggle value={selection === 'system'} onValueChange={toggleSystemTheme} />
                 </CardElement>
+                {selection !== 'system' && (
+                    <>
+                        <Divider />
+                        <CardElement horizontal spaceBetween>
+                            <Text>Modo escuro</Text>
+                            <AccentToggle value={selection === 'dark'} onValueChange={changeTheme} />
+                        </CardElement>
+                    </>
+                )}
                 <Divider />
                 <CardElement>
                     <SmallSimpleButton style={{ color: globalColors(theme).redHighlight, textAlign: 'center' }} onPress={() => handleLogout(navigation)}>
@@ -125,9 +108,8 @@ export default function Profile({ navigation }: ProfileProps) {
 
 const localStyles = StyleSheet.create({
     profilePicture: {
-        zIndex: 1,
         height: 90,
         width: 90,
-        borderRadius: 69
+        borderRadius: 70
     },
 });

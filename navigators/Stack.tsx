@@ -4,7 +4,7 @@ import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
 
 import globalStyles from '../styles/Styles';
-import { useThemeMode } from '../styles/ThemeProvider';
+import { useThemeMode } from '../components/ThemeProvider';
 
 import Tabs from './Tabs';
 import Login from '../screens/Login';

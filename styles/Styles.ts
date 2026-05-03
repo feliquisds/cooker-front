@@ -148,6 +148,7 @@ export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap
             minHeight: 45
         },
         card_element: {
+            borderRadius: 30,
             padding: globalStyleVariables.itemPadding
         },
 

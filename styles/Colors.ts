@@ -1,5 +1,5 @@
 import type { Gradient } from '../components/Types';
-import { resolveThemeMode, type ThemeMode } from './Theme';
+import { resolveThemeMode, type ThemeSelection } from './Theme';
 
 type ThemeColors = {
     background: string;
@@ -45,7 +45,7 @@ const darkColors: ThemeColors = {
     ...fixedColors
 };
 
-export default function globalColors(force: ThemeMode | '' = ''): ThemeColors {
+export default function globalColors(force: ThemeSelection | '' = ''): ThemeColors {
     const theme = resolveThemeMode(force);
 
     return {

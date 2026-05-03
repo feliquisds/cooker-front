@@ -1,7 +1,7 @@
 import globalColors from '../styles/Colors';
 import globalStyles from '../styles/Styles';
 import { TextInput } from 'react-native';
-import { useThemeMode } from '../styles/ThemeProvider';
+import { useThemeMode } from './ThemeProvider';
 import type { StyleProp, TextStyle, ViewStyle } from 'react-native';
 import { useState } from 'react';
 import { BlurSurface } from './Interface';

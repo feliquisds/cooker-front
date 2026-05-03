@@ -1,7 +1,7 @@
 import { ReactNode } from 'react';
 import { View, type StyleProp, type ViewStyle } from 'react-native';
 import globalStyles from '../styles/Styles';
-import { useThemeMode } from '../styles/ThemeProvider';
+import { useThemeMode } from './ThemeProvider';
 
 export function getGap(gap?: number): ViewStyle {
     if (gap == 15) return { gap: 15 };

@@ -6,8 +6,8 @@ import { GradientSubtext } from './Texts';
 import { Section } from './Alignments';
 import globalStyles from '../styles/Styles';
 import globalColors from '../styles/Colors';
-import { useThemeMode } from '../styles/ThemeProvider';
 import { BlurSurface } from './Interface';
+import { useThemeMode } from './ThemeProvider';
 
 function getTabBarIcon(route: string, focused: boolean) {
     let icon: keyof typeof MaterialCommunityIcons.glyphMap | undefined;
@@ -36,9 +36,11 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
     const { buildHref } = useLinkBuilder();
     const { theme } = useThemeMode();
     const themedColors = globalColors(theme);
+    const themeRenderKey = `tabbar-${theme}`;
 
     return (
         <BlurSurface
+            key={themeRenderKey}
             intensity={40}
             style={[globalStyles(theme).tabBar, globalStyles(theme).shadow]}
         >
@@ -68,7 +70,7 @@ export function TabBar({ state, descriptors, navigation }: BottomTabBarProps) {
 
                     return (
                         <PlatformPressable
-                            key={route.name}
+                            key={`${route.name}-${theme}`}
                             href={buildHref(route.name, route.params)}
                             accessibilityState={isFocused ? { selected: true } : {}}
                             accessibilityLabel={options.tabBarAccessibilityLabel}

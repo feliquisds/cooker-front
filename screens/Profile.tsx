@@ -11,21 +11,9 @@ import globalColors from '../styles/Colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Input } from '../components/Inputs';
 import { useEffect, useState } from 'react';
-import AsyncStorage from '@react-native-async-storage/async-storage';
-
-const DATA = {
-    id: '',
-    handle: 'marimari12',
-    name: 'Mariana',
-    email: '',
-    avatarUrl: null,
-    bio: 'Apaixonada por um bolo de cenoura',
-    birthDate: '1980-05-15',
-    isPrivate: false,
-    notificationTags: ['doce', 'bolo', 'cenoura'],
-    favoriteRecipeIds: ['1', '2'],
-    savedBookIds: ['1']
-}
+import AuthService from '../services/AuthService';
+import UserService from '../services/UserService';
+import type { User } from '../model/User';
 
 type ProfileNavigation = ScreenNavigation<{
     Login: undefined;
@@ -43,9 +31,8 @@ type ChildProps = {
     setLoggedIn: (loggedIn: boolean) => void;
 };
 
-function timeout(delay: number): Promise<void> {
-    return new Promise((resolve) => setTimeout(resolve, delay));
-}
+const authService = new AuthService();
+const userService = new UserService();
 
 async function handleLogin(
     setloggedIn: (value: boolean) => void,
@@ -53,16 +40,22 @@ async function handleLogin(
     email: string,
     pass: string
 ): Promise<void> {
-    activity(true);
-    await timeout(1000);
+    if (!email || !pass) {
+        return;
+    }
 
-    AsyncStorage.setItem('loggedIn', 'true');
-    setloggedIn(true);
-    activity(false);
+    activity(true);
+
+    try {
+        await authService.login({ email, password: pass });
+        setloggedIn(true);
+    } finally {
+        activity(false);
+    }
 }
 
-function handleLogout(setLoggedIn: (value: boolean) => void) {
-    AsyncStorage.removeItem('loggedIn');
+async function handleLogout(setLoggedIn: (value: boolean) => void) {
+    await authService.logout();
     setLoggedIn(false);
 }
 
@@ -179,6 +172,38 @@ function LoggedOutScreen({ navigation, setLoggedIn }: ChildProps) {
 
 function LoggedInScreen({navigation, setLoggedIn}: ChildProps) {
     const { theme } = useThemeMode();
+    const [profile, setProfile] = useState<User | null>(null);
+    const [loadingProfile, setLoadingProfile] = useState(true);
+
+    useEffect(() => {
+        let mounted = true;
+
+        void userService.getMyProfile()
+            .then((user) => {
+                if (mounted) {
+                    setProfile(user);
+                }
+            })
+            .catch(() => {
+                if (mounted) {
+                    setProfile(null);
+                }
+            })
+            .finally(() => {
+                if (mounted) {
+                    setLoadingProfile(false);
+                }
+            });
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    const displayName = profile?.name ?? '';
+    const displayHandle = profile?.handle ?? '';
+    const displayBio = profile?.bio ?? 'Sem bio';
+    const avatarSource = profile?.avatarUrl ? { uri: profile.avatarUrl } : undefined;
 
     return (
         <SimpleScreen tabScreen>
@@ -187,16 +212,20 @@ function LoggedInScreen({navigation, setLoggedIn}: ChildProps) {
             <Card>
                 <CardElement horizontal gap={15}>
                     <Image
-                        // source={require('../assets/parentPfp.webp')}
+                        source={avatarSource ?? require('../assets/default-avatar.png')}
                         style={localStyles.profilePicture}
                     />
                     <Section style={{ alignSelf: 'center' }}>
-                        <Header>{DATA.name}</Header>
-                        <Subtext>@{DATA.handle}</Subtext>
+                        <Header>{displayName}</Header>
+                        <Subtext>@{displayHandle}</Subtext>
                     </Section>
                 </CardElement>
                 <CardElement>
-                    <Subtext>{DATA.bio}</Subtext>
+                    {loadingProfile ? (
+                        <ActivityIndicator color={globalColors(theme).accent[0]} />
+                    ) : (
+                        <Subtext>{displayBio}</Subtext>
+                    )}
                 </CardElement>
                 <Divider />
                 <SmallSimpleButton cardItem onPress={() => navigation.navigate('EditProfile')}>Editar informações</SmallSimpleButton>
@@ -228,9 +257,17 @@ export default function Profile({ navigation }: ProfileProps) {
     const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 
     useEffect(() => {
-        AsyncStorage.getItem('loggedIn').then(value => {
-            setLoggedIn(value === 'true');
+        let mounted = true;
+
+        void authService.isAuthenticated().then((authenticated) => {
+            if (mounted) {
+                setLoggedIn(authenticated);
+            }
         });
+
+        return () => {
+            mounted = false;
+        };
     }, []);
 
     if (loggedIn === null) {

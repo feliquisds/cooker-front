@@ -1,8 +1,8 @@
 import axios, { AxiosInstance, AxiosRequestConfig, InternalAxiosRequestConfig } from 'axios';
+import { getAuthToken } from '../services/AuthSession';
 
 export class APIAdapter {
   private api: AxiosInstance;
-  private userHeaderName = 'X-User-ID';
 
   constructor(endpoint: string = '') {
     const basePath = endpoint ? `/api/${endpoint}` : '/api';
@@ -12,18 +12,20 @@ export class APIAdapter {
     });
 
     this.api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {
+      const token = await getAuthToken();
+
+      if (token) {
+        config.headers.Authorization = `Bearer ${token}`;
+      }
+
       return config;
     });
   }
 
-  async get<T>(path: string, userId?: string, params?: Record<string, any>): Promise<T> {
+  async get<T>(path: string, params?: Record<string, any>): Promise<T> {
     try {
       const config: AxiosRequestConfig = {};
-      
-      if (userId) {
-        config.headers = { [this.userHeaderName]: userId };
-      }
-      
+
       if (params) {
         config.params = params;
       }
@@ -35,14 +37,10 @@ export class APIAdapter {
     }
   }
 
-  async post<T>(path: string, data?: any, userId?: string, params?: Record<string, any>): Promise<T> {
+  async post<T>(path: string, data?: any, params?: Record<string, any>): Promise<T> {
     try {
       const config: AxiosRequestConfig = {};
-      
-      if (userId) {
-        config.headers = { [this.userHeaderName]: userId };
-      }
-      
+
       if (params) {
         config.params = params;
       }
@@ -54,14 +52,10 @@ export class APIAdapter {
     }
   }
 
-  async patch<T>(path: string, data?: any, userId?: string, params?: Record<string, any>): Promise<T> {
+  async patch<T>(path: string, data?: any, params?: Record<string, any>): Promise<T> {
     try {
       const config: AxiosRequestConfig = {};
-      
-      if (userId) {
-        config.headers = { [this.userHeaderName]: userId };
-      }
-      
+
       if (params) {
         config.params = params;
       }
@@ -73,14 +67,10 @@ export class APIAdapter {
     }
   }
 
-  async put<T>(path: string, data?: any, userId?: string, params?: Record<string, any>): Promise<T> {
+  async put<T>(path: string, data?: any, params?: Record<string, any>): Promise<T> {
     try {
       const config: AxiosRequestConfig = {};
-      
-      if (userId) {
-        config.headers = { [this.userHeaderName]: userId };
-      }
-      
+
       if (params) {
         config.params = params;
       }
@@ -92,14 +82,10 @@ export class APIAdapter {
     }
   }
 
-  async delete<T>(path: string, userId?: string, params?: Record<string, any>): Promise<T> {
+  async delete<T>(path: string, params?: Record<string, any>): Promise<T> {
     try {
       const config: AxiosRequestConfig = {};
-      
-      if (userId) {
-        config.headers = { [this.userHeaderName]: userId };
-      }
-      
+
       if (params) {
         config.params = params;
       }

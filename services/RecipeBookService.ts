@@ -8,15 +8,15 @@ export default class RecipeBookService {
         this.#adapter = new APIAdapter('books');
     }
 
-    async getRecipeBooks(userId: string): Promise<RecipeBook[]> {
-        return this.#adapter.get<RecipeBook[]>('/', userId);
+    async getRecipeBooks(): Promise<RecipeBook[]> {
+        return this.#adapter.get<RecipeBook[]>('/');
     }
 
-    async getRecipeBookById(bookId: string, userId: string): Promise<RecipeBook> {
-        return this.#adapter.get<RecipeBook>(`/${bookId}`, userId);
+    async getRecipeBookById(bookId: string): Promise<RecipeBook> {
+        return this.#adapter.get<RecipeBook>(`/${bookId}`);
     }
 
-    async createRecipeBook(bookData: Partial<RecipeBook>, userId: string): Promise<RecipeBook> {
-        return this.#adapter.post<RecipeBook>('/', bookData, userId);
+    async createRecipeBook(bookData: Partial<RecipeBook>): Promise<RecipeBook> {
+        return this.#adapter.post<RecipeBook>('/', bookData);
     }
 }

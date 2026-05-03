@@ -13,14 +13,13 @@ export default class RecipeService {
         return this.#adapter.get<Recipe>(`/${recipeId}`);
     }
 
-    async createRecipe(recipeData: Partial<Recipe>, userId: string): Promise<Recipe> {
-        return this.#adapter.post<Recipe>('/', recipeData, userId);
+    async createRecipe(recipeData: Partial<Recipe>): Promise<Recipe> {
+        return this.#adapter.post<Recipe>('/', recipeData);
     }
 
     async searchRecipes(title: string, tags: string[], difficulty: Difficulty, authorHandle: string): Promise<Recipe[]> {
         return this.#adapter.get<Recipe[]>(
             '/search',
-            undefined,
             { title, tags: tags.join(','), difficulty, authorHandle }
         );
     }

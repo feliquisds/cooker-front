@@ -1,5 +1,5 @@
 import { Difficulty } from "./Difficulty";
-import { Ingredient } from "./Ingredient";
+import { IngredientSection } from "./IngredientSection";
 
 export interface Recipe {
   id: string;
@@ -11,7 +11,7 @@ export interface Recipe {
   timeMinutes: number;
   portions: number;
   descriptionMD: string;
-  ingredients: Ingredient[]; // Interface { quantity, unit, name }
+  ingredients: IngredientSection[]; // Interface { quantity, unit, name }
   stepsMD: string[];
   isPublic: boolean;
   createdAt: string | null; // ISO string vinda do JSON

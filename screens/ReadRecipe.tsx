@@ -21,14 +21,15 @@ type ReadRecipeNavigation = ScreenNavigation<{}> & {
 export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadRecipeNavigation; recipeId: string }) {
     const { theme } = useThemeMode();
     const [recipe, setRecipe] = useState<Recipe | null>(null);
-    const [checkedIngredients, setCheckedIngredients] = useState<Set<number>>(new Set());
+    const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
 
-    const toggleIngredient = (index: number) => {
+    const toggleIngredient = (sectionIndex: number, ingredientIndex: number) => {
+        const key = `${sectionIndex}-${ingredientIndex}`;
         const updated = new Set(checkedIngredients);
-        if (updated.has(index)) {
-            updated.delete(index);
+        if (updated.has(key)) {
+            updated.delete(key);
         } else {
-            updated.add(index);
+            updated.add(key);
         }
         setCheckedIngredients(updated);
     };
@@ -66,19 +67,32 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
             <Card>
                 <CardElement gap={10}>
                     <Header accented>Ingredientes</Header>
-                    {recipe.ingredients.map((ingredient, index) => (
-                        <Pressable onPress={() => toggleIngredient(index)}>
-                            <Section horizontal centerVertical gap={10} key={index}>
-                                <MaterialCommunityIcons
-                                    name={checkedIngredients.has(index) ? 'checkbox-marked' : 'checkbox-blank-outline'}
-                                    size={20}
-                                    color={globalColors(theme).text}
-                                />
-                                <Text style={checkedIngredients.has(index) ? { textDecorationLine: 'line-through', opacity: 0.5 } : {}}>
-                                    {ingredient.quantity}{ingredient.unit} de {ingredient.name}
-                                </Text>
+                    {recipe.ingredients.map((section, sectionIndex) => (
+                        <Section key={sectionIndex} gap={10}>
+                            {section.title && section.title !== 'default' && (
+                                <Header>{section.title}</Header>
+                            )}
+                            <Section gap={10}>
+                                {section.ingredients.map((ingredient, ingredientIndex) => {
+                                    const key = `${sectionIndex}-${ingredientIndex}`;
+                                    const isChecked = checkedIngredients.has(key);
+                                    return (
+                                        <Pressable key={key} onPress={() => toggleIngredient(sectionIndex, ingredientIndex)}>
+                                            <Section horizontal centerVertical gap={10}>
+                                                <MaterialCommunityIcons
+                                                    name={isChecked ? 'checkbox-marked' : 'checkbox-blank-outline'}
+                                                    size={20}
+                                                    color={globalColors(theme).text}
+                                                />
+                                                <Text style={isChecked ? { textDecorationLine: 'line-through', opacity: 0.5 } : {}}>
+                                                    {ingredient.quantity}{ingredient.unit} de {ingredient.name}
+                                                </Text>
+                                            </Section>
+                                        </Pressable>
+                                    );
+                                })}
                             </Section>
-                        </Pressable>
+                        </Section>
                     ))}
                 </CardElement>
             </Card>

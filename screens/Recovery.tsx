@@ -8,15 +8,8 @@ import { Section } from '../components/Alignments';
 import { BigAccentButton } from '../components/Buttons';
 import type { ScreenNavigation } from '../components/Types';
 
-type RecoveryNavigation = ScreenNavigation<{
-    Recovery: undefined;
-    Tabs: undefined;
-}> & {
+type RecoveryNavigation = ScreenNavigation<{}> & {
     goBack: () => void;
-};
-
-type RecoveryProps = {
-    navigation: RecoveryNavigation;
 };
 
 function timeout(delay: number): Promise<void> {
@@ -31,7 +24,7 @@ async function processRecovery(navigation: RecoveryNavigation, activity: (value:
     activity(false);
 }
 
-export default function Recovery({ navigation }: RecoveryProps) {
+export default function Recovery({ navigation }: { navigation: RecoveryNavigation }) {
     const [showActivityIndicator, changeShowActivityIndicator] = useState(false);
     const [getEmail, setEmail] = useState('');
 

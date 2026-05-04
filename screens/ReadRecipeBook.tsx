@@ -21,16 +21,10 @@ type ReadRecipeBookNavigation = ScreenNavigation<{}> & {
     navigate: (screen: string, params: any) => void;
 };
 
-type ReadRecipeBookProps = {
-    navigation: ReadRecipeBookNavigation;
-    bookId: string;
-    title?: string;
-};
-
 const recipeBookService = new RecipeBookService();
 const userService = new UserService();
 
-export default function ReadRecipeBook({ navigation, bookId, title }: ReadRecipeBookProps) {
+export default function ReadRecipeBook({ navigation, bookId, title }: { navigation: ReadRecipeBookNavigation; bookId: string; title?: string }) {
     const [authenticatedUserId, setAuthenticatedUserId] = useState<string | null>(null);
     const { theme } = useThemeMode();
     const [book, setBook] = useState<RecipeBook | null>(null);

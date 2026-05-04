@@ -11,12 +11,7 @@ type ReadTextNavigation = ScreenNavigation<{}> & {
     goBack: () => void;
 };
 
-type ReadTextProps = {
-    navigation: ReadTextNavigation;
-    textId: string;
-};
-
-export default function ReadText({ navigation, textId }: ReadTextProps) {
+export default function ReadText({ navigation, textId }: { navigation: ReadTextNavigation; textId: string }) {
     const { theme } = useThemeMode();
     const [loading, setLoading] = useState(true);
 

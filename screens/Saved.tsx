@@ -17,10 +17,6 @@ type SavedNavigation = ScreenNavigation<{
     ReadRecipeBook: { bookId: string; title: string };
 }>;
 
-type SavedProps = {
-    navigation: SavedNavigation;
-};
-
 const recipeBookService = new RecipeBookService();
 const userService = new UserService();
 
@@ -70,7 +66,7 @@ function SavedBookCard({
     );
 }
 
-export default function Saved({ navigation }: SavedProps) {
+export default function Saved({ navigation }: { navigation: SavedNavigation }) {
     const { theme } = useThemeMode();
     const [books, setBooks] = useState<RecipeBook[]>([]);
     const [authorAvatars, setAuthorAvatars] = useState<Record<string, string | null>>({});

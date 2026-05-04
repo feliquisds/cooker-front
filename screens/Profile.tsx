@@ -23,10 +23,6 @@ type ProfileNavigation = ScreenNavigation<{
     Favorited: undefined;
 }>;
 
-type ProfileProps = {
-    navigation: ProfileNavigation;
-};
-
 type ChildProps = {
     navigation: ProfileNavigation;
     setLoggedIn: (loggedIn: boolean) => void;
@@ -256,7 +252,7 @@ function LoggedInScreen({navigation, setLoggedIn}: ChildProps) {
     );
 }
 
-export default function Profile({ navigation }: ProfileProps) {
+export default function Profile({ navigation }: { navigation: ProfileNavigation }) {
     const { theme } = useThemeMode();
     const [loggedIn, setLoggedIn] = useState<boolean | null>(null);
 

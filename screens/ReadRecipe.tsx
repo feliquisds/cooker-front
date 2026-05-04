@@ -86,7 +86,7 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
                                                     color={globalColors(theme).text}
                                                 />
                                                 <Text style={isChecked ? { textDecorationLine: 'line-through', opacity: 0.5 } : {}}>
-                                                    {ingredient.quantity}{(ingredient.unit != null) ? ingredient.unit + ' ' : ' '}{ingredient.name}
+                                                    {ingredient.quantity} {ingredient.unit} {ingredient.name}
                                                 </Text>
                                             </Section>
                                         </Pressable>

@@ -6,7 +6,7 @@ import { RecipeRef } from '../model/RecipeRef';
 import { TextRef } from '../model/TextRef';
 import { Section } from './Alignments';
 import { Card, CardElement } from './Cards';
-import { Header, Subtext, Text } from './Texts';
+import { Subtext, Text } from './Texts';
 import { useThemeMode } from './ThemeProvider';
 import globalColors from '../styles/Colors';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
@@ -47,11 +47,11 @@ function BookEntryCard({
             <Pressable onPress={() => navigation.navigate('ReadRecipe', { recipeId: item.recipeId })}>
                 <Card>
                     <CardElement horizontal gap={10} centerVertical>
-                        <MaterialCommunityIcons name="book-open" size={20} color={globalColors(theme).accent[0]} />
+                        <MaterialCommunityIcons name="book-open" size={20} color={globalColors(theme).text} />
                         <Section style={{ flex: 1 }}>
                             <Text>{item.title}</Text>
                         </Section>
-                        <MaterialCommunityIcons name="chevron-right" size={20} color={globalColors(theme).inactive} />
+                        <MaterialCommunityIcons name="chevron-right" size={20} color={globalColors(theme).subtext} />
                     </CardElement>
                 </Card>
             </Pressable>
@@ -63,11 +63,11 @@ function BookEntryCard({
             <Pressable onPress={() => navigation.navigate('ReadText', { textId: item.textId })}>
                 <Card>
                     <CardElement horizontal gap={10} centerVertical>
-                        <MaterialCommunityIcons name="file-document" size={20} color={globalColors(theme).accent[0]} />
+                        <MaterialCommunityIcons name="file-document" size={20} color={globalColors(theme).text} />
                         <Section style={{ flex: 1 }}>
                             <Text>{item.title}</Text>
                         </Section>
-                        <MaterialCommunityIcons name="chevron-right" size={20} color={globalColors(theme).inactive} />
+                        <MaterialCommunityIcons name="chevron-right" size={20} color={globalColors(theme).subtext} />
                     </CardElement>
                 </Card>
             </Pressable>
@@ -86,7 +86,7 @@ function BookEntryCard({
                             <MaterialCommunityIcons
                                 name={isExpanded ? 'chevron-down' : 'chevron-right'}
                                 size={20}
-                                color={globalColors(theme).accent[0]}
+                                color={globalColors(theme).subtext}
                             />
                         </CardElement>
                     </Card>

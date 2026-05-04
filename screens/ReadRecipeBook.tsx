@@ -14,6 +14,7 @@ import { SearchBox } from '../components/Inputs';
 import { Card, CardElement } from '../components/Cards';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BookContent } from '../components/BookContent';
+import { getAuthenticatedUserId } from '../services/AuthSession';
 
 type ReadRecipeBookNavigation = ScreenNavigation<{}> & {
     goBack: () => void;
@@ -30,6 +31,7 @@ const recipeBookService = new RecipeBookService();
 const userService = new UserService();
 
 export default function ReadRecipeBook({ navigation, bookId, title }: ReadRecipeBookProps) {
+    const [authenticatedUserId, setAuthenticatedUserId] = useState<string | null>(null);
     const { theme } = useThemeMode();
     const [book, setBook] = useState<RecipeBook | null>(null);
     const [owner, setOwner] = useState<UserPublic | null>(null);
@@ -47,6 +49,8 @@ export default function ReadRecipeBook({ navigation, bookId, title }: ReadRecipe
                     setBook(fetchedBook);
 
                     try {
+                        const authId = await getAuthenticatedUserId();
+                        setAuthenticatedUserId(authId);
                         const ownerProfile = await userService.getPublicProfileById(fetchedBook.ownerId);
                         if (mounted) {
                             setOwner(ownerProfile);
@@ -92,13 +96,15 @@ export default function ReadRecipeBook({ navigation, bookId, title }: ReadRecipe
         <SimpleScreen>
             <Section horizontal gap={10} centerVertical style={{ marginBottom: 10 }}>
                 <TitleWithBackButton navigation={navigation}>{displayedTitle}</TitleWithBackButton>
-                <Pressable onPress={toggleSaveBook} disabled={savingStatus}>
-                    <MaterialCommunityIcons
-                        name={isSaved ? 'bookmark' : 'bookmark-outline'}
-                        size={24}
-                        color={isSaved ? globalColors(theme).accent[0] : globalColors(theme).subtext}
-                    />
-                </Pressable>
+                {book?.ownerId != authenticatedUserId && authenticatedUserId == null && (
+                    <Pressable onPress={toggleSaveBook} disabled={savingStatus}>
+                        <MaterialCommunityIcons
+                            name={isSaved ? 'bookmark' : 'bookmark-outline'}
+                            size={24}
+                            color={isSaved ? globalColors(theme).accent[0] : globalColors(theme).subtext}
+                        />
+                    </Pressable>
+                )}
             </Section>
 
             {!book || !owner ? (

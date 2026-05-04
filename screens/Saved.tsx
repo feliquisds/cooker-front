@@ -1,71 +1,154 @@
-import { FlatList, type ListRenderItem } from 'react-native';
-import { Divider, SimpleScreen } from '../components/Interface';
-import { Header, Title, Text, Subtext } from '../components/Texts';
+import { useEffect, useState } from 'react';
+import { ActivityIndicator, Image, ImageStyle } from 'react-native';
+import { PlatformPressable } from '@react-navigation/elements';
 import { Card, CardElement } from '../components/Cards';
-import { SmallAccentButton } from '../components/Buttons';
 import { Section } from '../components/Alignments';
-import type { ScreenNavigation } from '../components/Types';
+import { SimpleScreen } from '../components/Interface';
+import { Subtext, Text, Title } from '../components/Texts';
+import { ScreenNavigation } from '../components/Types';
+import RecipeBookService from '../services/RecipeBookService';
+import UserService from '../services/UserService';
+import { RecipeBook } from '../model/RecipeBook';
+import type { UserPublic } from '../model/dto/UserPublic';
+import { useThemeMode } from '../components/ThemeProvider';
+import globalColors from '../styles/Colors';
 
-type ReportItem = {
-    id: string;
-    title: string;
-    date: string;
-    score: string;
-    subject: string;
-};
-
-const DATA: ReportItem[] = [
-    { id: '1', title: 'Multiplicação', date: '10 de set.', score: '5,00', subject: 'Matemática' },
-    { id: '2', title: 'História do Brasil', date: '9 de set.', score: '8,00', subject: 'História' },
-    { id: '3', title: 'Verbos', date: '8 de set.', score: '9,00', subject: 'Português' },
-];
-
-type ReportsNavigation = ScreenNavigation<{
-    AIReport: undefined;
+type SavedNavigation = ScreenNavigation<{
+    ReadRecipeBook: { bookId: string; title: string };
 }>;
 
-type ReportsProps = {
-    navigation: ReportsNavigation;
+type SavedProps = {
+    navigation: SavedNavigation;
 };
 
-const renderNote: ListRenderItem<ReportItem> = ({ item }) => (
-    <CardElement horizontal spaceBetween centerVertical>
-        <Section>
-            <Text>{item.title}</Text>
-            <Subtext>{item.date}</Subtext>
-        </Section>
-        <Section alignRight>
-            <Header>{item.score}</Header>
-            <Subtext>{item.subject}</Subtext>
-        </Section>
-    </CardElement>
-);
+const recipeBookService = new RecipeBookService();
+const userService = new UserService();
 
-export default function Saved({ navigation }: ReportsProps) {
+function formatDate(value?: string | null): string {
+    if (!value) {
+        return 'Sem data de atualização';
+    }
+
+    const date = new Date(value);
+    if (Number.isNaN(date.getTime())) {
+        return 'Sem data de atualização';
+    }
+
+    return date.toLocaleDateString('pt-BR', {
+        day: '2-digit',
+        month: '2-digit',
+        year: 'numeric'
+    });
+}
+
+function SavedBookCard({
+    book,
+    navigation,
+    authorAvatarUrl
+}: {
+    book: RecipeBook;
+    navigation: SavedNavigation;
+    authorAvatarUrl?: string | null;
+}) {
+    const authorAvatar = authorAvatarUrl ? { uri: authorAvatarUrl } : require('../assets/default-avatar.png');
+    const updatedAt = formatDate(book.updatedAt);
+
     return (
-        <SimpleScreen tabScreen>
-            <Title>Relatório</Title>
+        <PlatformPressable onPress={() => navigation.navigate('ReadRecipeBook', { bookId: book.id, title: book.title })}>
+            <Card>
+                <CardElement horizontal gap={15} centerVertical>
+                    <Section style={{ flex: 1 }} gap={5}>
+                        <Text>{book.title}</Text>
+                        <Subtext>{book.tags.length > 0 ? book.tags.map(tag => `#${tag}`).join(' ') : 'Sem tags'}</Subtext>
+                        <Subtext>Atualizado em {updatedAt}</Subtext>
+                    </Section>
 
-            <Card label={'Notas'}>
-                <FlatList
-                    data={DATA}
-                    keyExtractor={(i) => i.id}
-                    renderItem={renderNote}
-                    ItemSeparatorComponent={() => <Divider />}
-                />
-
-                <Divider />
-
-                <CardElement>
-                    <SmallAccentButton>Verificar atividades recentes</SmallAccentButton>
-                </CardElement>
-
-                <Divider />
-
-                <CardElement>
-                    <SmallAccentButton>Verificar boletim</SmallAccentButton>
+                    <Image source={authorAvatar} style={localStyles.avatar} />
                 </CardElement>
             </Card>
+        </PlatformPressable>
+    );
+}
+
+export default function Saved({ navigation }: SavedProps) {
+    const { theme } = useThemeMode();
+    const [books, setBooks] = useState<RecipeBook[]>([]);
+    const [authorAvatars, setAuthorAvatars] = useState<Record<string, string | null>>({});
+    const [loading, setLoading] = useState(true);
+
+    useEffect(() => {
+        let mounted = true;
+
+        const fetchSavedBooks = async () => {
+            try {
+                const savedBooks = await recipeBookService.getSavedRecipeBooks();
+                if (mounted) {
+                    setBooks(savedBooks);
+                }
+
+                const uniqueOwnerIds = [...new Set(savedBooks.map((book) => book.ownerId))];
+                const avatarEntries = await Promise.all(
+                    uniqueOwnerIds.map(async (ownerId) => {
+                        try {
+                            const profile: UserPublic = await userService.getPublicProfileById(ownerId);
+                            return [ownerId, profile.avatarUrl] as const;
+                        } catch {
+                            return [ownerId, null] as const;
+                        }
+                    })
+                );
+
+                if (mounted) {
+                    setAuthorAvatars(Object.fromEntries(avatarEntries));
+                }
+            } finally {
+                if (mounted) {
+                    setLoading(false);
+                }
+            }
+        };
+
+        void fetchSavedBooks();
+
+        return () => {
+            mounted = false;
+        };
+    }, []);
+
+    return (
+        <SimpleScreen tabScreen>
+            <Section gap={15}>
+                <Title>Salvo</Title>
+
+                {loading ? (
+                    <Section centerVertical style={{ minHeight: 240 }}>
+                        <ActivityIndicator color={globalColors(theme).accent[0]} />
+                    </Section>
+                ) : books.length === 0 ? (
+                    <Section centerVertical style={{ minHeight: 240 }}>
+                        <Subtext style={{ textAlign: 'center' }}>Nenhum livro de receitas salvo ainda</Subtext>
+                    </Section>
+                ) : (
+                    <Section gap={15}>
+                        {books.map((book) => (
+                            <SavedBookCard
+                                key={book.id}
+                                book={book}
+                                navigation={navigation}
+                                authorAvatarUrl={authorAvatars[book.ownerId]}
+                            />
+                        ))}
+                    </Section>
+                )}
+            </Section>
         </SimpleScreen>
     );
 }
+
+const localStyles = {
+    avatar: {
+        width: 56,
+        height: 56,
+        borderRadius: 28
+    } as ImageStyle
+};

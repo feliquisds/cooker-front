@@ -9,4 +9,5 @@ export interface RecipeBook {
   isPublic: boolean;
   items: BookComponent[];
   createdAt: string | null;
+  updatedAt: string | null;
 }

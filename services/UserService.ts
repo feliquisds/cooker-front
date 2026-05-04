@@ -13,8 +13,12 @@ export default class UserService {
         return this.#adapter.get<User>('/me');
     }
 
-    async getPublicProfile(userHandle: string): Promise<UserPublic> {
+    async getPublicProfileByHandle(userHandle: string): Promise<UserPublic> {
         return this.#adapter.get<UserPublic>(`/profile/${userHandle}`);
+    }
+
+    async getPublicProfileById(userId: string): Promise<UserPublic> {
+        return this.#adapter.get<UserPublic>(`/profile/id/${userId}`);
     }
 
     async togglePrivacy(isPrivate: boolean): Promise<any> {

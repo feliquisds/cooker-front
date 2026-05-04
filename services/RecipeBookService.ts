@@ -19,4 +19,15 @@ export default class RecipeBookService {
     async createRecipeBook(bookData: Partial<RecipeBook>): Promise<RecipeBook> {
         return this.#adapter.post<RecipeBook>('/', bookData);
     }
+
+    async searchRecipeBooks(title: string, tags: string[], authorHandle: string): Promise<RecipeBook[]> {
+        return this.#adapter.get<RecipeBook[]>(
+            '/search',
+            { title, tags: tags.join(','), authorHandle }
+        );
+    }
+
+    async getSavedRecipeBooks(): Promise<RecipeBook[]> {
+        return this.#adapter.get<RecipeBook[]>('/saved');
+    }
 }

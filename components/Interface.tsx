@@ -1,5 +1,5 @@
-import { ReactNode } from 'react';
-import { ImageBackground, type ImageResizeMode, type ImageSourcePropType, ScrollView, View, type StyleProp, type ViewStyle, StyleSheet } from 'react-native';
+import { ReactNode, useState } from 'react';
+import { ImageBackground, type ImageResizeMode, type ImageSourcePropType, ScrollView, View, type StyleProp, type ViewStyle, StyleSheet, RefreshControl, Platform } from 'react-native';
 import { getGap, Section } from './Alignments';
 import globalStyles from '../styles/Styles';
 import { PlatformPressable } from '@react-navigation/elements';
@@ -14,13 +14,26 @@ type ScreenProps = {
     fill?: boolean;
     scrollPadding?: boolean;
     tabScreen?: boolean;
+    onRefresh?: () => Promise<void>;
 };
 
-export function SimpleScreen({ children, style, containerStyle, fill, scrollPadding, tabScreen }: ScreenProps) {
+export function SimpleScreen({ children, style, containerStyle, fill, scrollPadding, tabScreen, onRefresh }: ScreenProps) {
+    const [refreshing, setRefreshing] = useState(false);
     const { theme } = useThemeMode();
     const styles = globalStyles(theme);
     const scrollPaddingStyle = styles.scrollPadding;
     const tabScreenPaddingStyle = styles.tabScreenPadding;
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        try {
+            if (onRefresh) {
+                await onRefresh();
+            }
+        } finally {
+            setRefreshing(false);
+        }
+    };
 
     return (
         <ScrollView
@@ -32,6 +45,16 @@ export function SimpleScreen({ children, style, containerStyle, fill, scrollPadd
                 scrollPadding ? scrollPaddingStyle : {},
                 tabScreen ? tabScreenPaddingStyle : {}
             ]}
+            scrollEnabled={true}
+            refreshControl={
+                Platform.OS !== 'web' && onRefresh ? (
+                    <RefreshControl
+                        refreshing={refreshing}
+                        onRefresh={handleRefresh}
+                        progressViewOffset={0}
+                    />
+                ) : undefined
+            }
         >
             {children}
         </ScrollView>
@@ -43,11 +66,23 @@ type ImageScreenProps = ScreenProps & {
     resizeMode?: ImageResizeMode;
 };
 
-export function ImageScreen({ children, style, containerStyle, fill, scrollPadding, tabScreen, source, resizeMode = 'cover' }: ImageScreenProps) {
+export function ImageScreen({ children, style, containerStyle, fill, scrollPadding, tabScreen, source, resizeMode = 'cover', onRefresh }: ImageScreenProps) {
+    const [refreshing, setRefreshing] = useState(false);
     const { theme } = useThemeMode();
     const styles = globalStyles(theme);
     const scrollPaddingStyle = styles.scrollPadding;
     const tabScreenPaddingStyle = styles.tabScreenPadding;
+
+    const handleRefresh = async () => {
+        setRefreshing(true);
+        try {
+            if (onRefresh) {
+                await onRefresh();
+            }
+        } finally {
+            setRefreshing(false);
+        }
+    };
 
     return (
         <ImageBackground source={source} resizeMode={resizeMode} style={[styles.staticArea, { width: '100%', height: '100%' }]}>
@@ -60,11 +95,22 @@ export function ImageScreen({ children, style, containerStyle, fill, scrollPaddi
                     scrollPadding ? scrollPaddingStyle : {},
                     tabScreen ? tabScreenPaddingStyle : {}
                 ]}
+                scrollEnabled={true}
+                refreshControl={
+                    Platform.OS !== 'web' && onRefresh ? (
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={handleRefresh}
+                            progressViewOffset={0}
+                        />
+                    ) : undefined
+                }
             >
                 {children}
             </ScrollView>
         </ImageBackground>
     );
+
 }
 
 export function Divider({ style }: { style?: StyleProp<ViewStyle> }) {

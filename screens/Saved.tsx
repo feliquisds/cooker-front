@@ -76,47 +76,35 @@ export default function Saved({ navigation }: SavedProps) {
     const [authorAvatars, setAuthorAvatars] = useState<Record<string, string | null>>({});
     const [loading, setLoading] = useState(true);
 
+    const fetchSavedBooks = async () => {
+        try {
+            const savedBooks = await recipeBookService.getSavedRecipeBooks();
+            setBooks(savedBooks);
+
+            const uniqueOwnerIds = [...new Set(savedBooks.map((book) => book.ownerId))];
+            const avatarEntries = await Promise.all(
+                uniqueOwnerIds.map(async (ownerId) => {
+                    try {
+                        const profile: UserPublic = await userService.getPublicProfileById(ownerId);
+                        return [ownerId, profile.avatarUrl] as const;
+                    } catch {
+                        return [ownerId, null] as const;
+                    }
+                })
+            );
+
+            setAuthorAvatars(Object.fromEntries(avatarEntries));
+        } finally {
+            setLoading(false);
+        }
+    };
+
     useEffect(() => {
-        let mounted = true;
-
-        const fetchSavedBooks = async () => {
-            try {
-                const savedBooks = await recipeBookService.getSavedRecipeBooks();
-                if (mounted) {
-                    setBooks(savedBooks);
-                }
-
-                const uniqueOwnerIds = [...new Set(savedBooks.map((book) => book.ownerId))];
-                const avatarEntries = await Promise.all(
-                    uniqueOwnerIds.map(async (ownerId) => {
-                        try {
-                            const profile: UserPublic = await userService.getPublicProfileById(ownerId);
-                            return [ownerId, profile.avatarUrl] as const;
-                        } catch {
-                            return [ownerId, null] as const;
-                        }
-                    })
-                );
-
-                if (mounted) {
-                    setAuthorAvatars(Object.fromEntries(avatarEntries));
-                }
-            } finally {
-                if (mounted) {
-                    setLoading(false);
-                }
-            }
-        };
-
         void fetchSavedBooks();
-
-        return () => {
-            mounted = false;
-        };
     }, []);
 
     return (
-        <SimpleScreen tabScreen>
+        <SimpleScreen tabScreen onRefresh={fetchSavedBooks}>
             <Section gap={15}>
                 <Title>Salvo</Title>
 

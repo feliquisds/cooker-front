@@ -1,5 +1,6 @@
 import * as SecureStore from 'expo-secure-store';
 import { Platform } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import type { AuthResponse } from '../model/dto/AuthResponse';
 
 const authTokenKey = 'authToken';
@@ -45,6 +46,7 @@ async function setValue(key: string, value: string): Promise<void> {
         return;
     }
 
+    // Try SecureStore first on native
     if (secureStoreAvailable()) {
         try {
             await withTimeout(SecureStore.setItemAsync(key, value), 5000);
@@ -52,9 +54,23 @@ async function setValue(key: string, value: string): Promise<void> {
             if (key === authTokenKey) tokenCache = value;
             else if (key === userIdKey) userIdCache = value;
             else if (key === userEmailKey) userEmailCache = value;
+            console.log(`[AuthSession] Successfully set ${key} in SecureStore`);
+            return;
         } catch (error) {
-            console.warn(`[AuthSession] Failed to set ${key} in SecureStore:`, error);
+            console.warn(`[AuthSession] SecureStore failed, falling back to AsyncStorage:`, error);
         }
+    }
+
+    // Fallback to AsyncStorage on native if SecureStore unavailable
+    try {
+        await AsyncStorage.setItem(key, value);
+        // Update cache on successful write
+        if (key === authTokenKey) tokenCache = value;
+        else if (key === userIdKey) userIdCache = value;
+        else if (key === userEmailKey) userEmailCache = value;
+        console.log(`[AuthSession] Successfully set ${key} in AsyncStorage`);
+    } catch (error) {
+        console.error(`[AuthSession] Failed to set ${key} in AsyncStorage:`, error);
     }
 }
 
@@ -68,6 +84,7 @@ async function getValue(key: string): Promise<string | null> {
     if (key === userIdKey && userIdCache !== undefined) return userIdCache;
     if (key === userEmailKey && userEmailCache !== undefined) return userEmailCache;
 
+    // Try SecureStore first on native
     if (secureStoreAvailable()) {
         try {
             const value = await withTimeout(SecureStore.getItemAsync(key), 5000);
@@ -77,12 +94,22 @@ async function getValue(key: string): Promise<string | null> {
             else if (key === userEmailKey) userEmailCache = value;
             return value;
         } catch (error) {
-            console.warn(`[AuthSession] Failed to get ${key} from SecureStore:`, error);
-            return null;
+            console.warn(`[AuthSession] SecureStore read failed, trying AsyncStorage:`, error);
         }
     }
 
-    return null;
+    // Fallback to AsyncStorage on native if SecureStore unavailable
+    try {
+        const value = await AsyncStorage.getItem(key);
+        // Cache the result
+        if (key === authTokenKey) tokenCache = value;
+        else if (key === userIdKey) userIdCache = value;
+        else if (key === userEmailKey) userEmailCache = value;
+        return value;
+    } catch (error) {
+        console.error(`[AuthSession] Failed to get ${key} from AsyncStorage:`, error);
+        return null;
+    }
 }
 
 async function deleteValue(key: string): Promise<void> {
@@ -95,6 +122,7 @@ async function deleteValue(key: string): Promise<void> {
         return;
     }
 
+    // Try SecureStore first on native
     if (secureStoreAvailable()) {
         try {
             await withTimeout(SecureStore.deleteItemAsync(key), 5000);
@@ -102,9 +130,21 @@ async function deleteValue(key: string): Promise<void> {
             if (key === authTokenKey) tokenCache = null;
             else if (key === userIdKey) userIdCache = null;
             else if (key === userEmailKey) userEmailCache = null;
+            return;
         } catch (error) {
-            console.warn(`[AuthSession] Failed to delete ${key} from SecureStore:`, error);
+            console.warn(`[AuthSession] SecureStore delete failed, trying AsyncStorage:`, error);
         }
+    }
+
+    // Fallback to AsyncStorage on native if SecureStore unavailable
+    try {
+        await AsyncStorage.removeItem(key);
+        // Clear cache on successful delete
+        if (key === authTokenKey) tokenCache = null;
+        else if (key === userIdKey) userIdCache = null;
+        else if (key === userEmailKey) userEmailCache = null;
+    } catch (error) {
+        console.error(`[AuthSession] Failed to delete ${key} from AsyncStorage:`, error);
     }
 }
 

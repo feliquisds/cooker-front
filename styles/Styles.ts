@@ -195,7 +195,9 @@ export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap
         },
         backButtonIcon: {
             color: globalColors(force).text,
-            fontSize: 24
+            fontSize: 24,
+            right: 6,
+            top: -2
         },
 
         // toggles

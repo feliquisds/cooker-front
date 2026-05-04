@@ -2,10 +2,8 @@ import { NavigationContainer } from '@react-navigation/native';
 import { createStackNavigator } from '@react-navigation/stack';
 import { SafeAreaView, SafeAreaProvider } from 'react-native-safe-area-context';
 import { StatusBar } from 'expo-status-bar';
-
 import globalStyles from '../styles/Styles';
 import { useThemeMode } from '../components/ThemeProvider';
-
 import Tabs from './Tabs';
 import Recovery from '../screens/Recovery';
 import Search from '../screens/Search';
@@ -13,6 +11,7 @@ import Profile from '../screens/Profile';
 import Saved from '../screens/Saved';
 import Home from '../screens/Home';
 import Favorited from '../screens/Favorited';
+import ReadRecipe from '../screens/ReadRecipe';
 
 type RootStackParamList = {
     Tabs: undefined;
@@ -23,6 +22,7 @@ type RootStackParamList = {
     Search: undefined;
     Profile: undefined;
     Favorited: undefined;
+    ReadRecipe: { recipeId: string };
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -49,6 +49,11 @@ export default function StackNavigator() {
                         <Stack.Screen name='Search' component={Search} />
                         <Stack.Screen name='Profile' component={Profile} />
                         <Stack.Screen name='Favorited' component={Favorited} />
+                        <Stack.Screen name='ReadRecipe'
+                            children={({ navigation, route }) => (
+                                <ReadRecipe navigation={navigation as any} recipeId={(route as any)?.params?.recipeId} />
+                            )}
+                        />
                     </Stack.Navigator>
                 </NavigationContainer>
             </SafeAreaView>

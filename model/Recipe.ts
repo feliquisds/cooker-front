@@ -11,7 +11,7 @@ export interface Recipe {
   timeMinutes: number;
   portions: number;
   descriptionMD: string;
-  ingredients: IngredientSection[]; // Interface { quantity, unit, name }
+  ingredientSections: IngredientSection[]; // Interface { quantity, unit, name }
   stepsMD: string[];
   isPublic: boolean;
   createdAt: string | null; // ISO string vinda do JSON

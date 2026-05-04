@@ -67,10 +67,11 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
             <Card>
                 <CardElement gap={10}>
                     <Header accented>Ingredientes</Header>
-                    {recipe.ingredients.map((section, sectionIndex) => (
+                    <Section gap={15}>
+                    {recipe.ingredientSections.map((section, sectionIndex) => (
                         <Section key={sectionIndex} gap={10}>
                             {section.title && section.title !== 'default' && (
-                                <Header>{section.title}</Header>
+                                <Text accented>{section.title}</Text>
                             )}
                             <Section gap={10}>
                                 {section.ingredients.map((ingredient, ingredientIndex) => {
@@ -85,7 +86,7 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
                                                     color={globalColors(theme).text}
                                                 />
                                                 <Text style={isChecked ? { textDecorationLine: 'line-through', opacity: 0.5 } : {}}>
-                                                    {ingredient.quantity}{ingredient.unit} de {ingredient.name}
+                                                    {ingredient.quantity}{(ingredient.unit != null) ? ingredient.unit + ' ' : ' '}{ingredient.name}
                                                 </Text>
                                             </Section>
                                         </Pressable>
@@ -94,6 +95,7 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
                             </Section>
                         </Section>
                     ))}
+                    </Section>
                 </CardElement>
             </Card>
 

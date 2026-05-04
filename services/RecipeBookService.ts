@@ -30,4 +30,12 @@ export default class RecipeBookService {
     async getSavedRecipeBooks(): Promise<RecipeBook[]> {
         return this.#adapter.get<RecipeBook[]>('/saved');
     }
+
+    async saveRecipeBook(bookId: string): Promise<void> {
+        await this.#adapter.post<void>(`/${bookId}/save`, null);
+    }
+
+    async unsaveRecipeBook(bookId: string): Promise<void> {
+        await this.#adapter.post<void>(`/${bookId}/unsave`, null);
+    }
 }

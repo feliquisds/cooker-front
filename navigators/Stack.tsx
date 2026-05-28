@@ -14,6 +14,7 @@ import Favorited from '../screens/Favorited';
 import ReadRecipe from '../screens/ReadRecipe';
 import ReadRecipeBook from '../screens/ReadRecipeBook';
 import ReadText from '../screens/ReadText';
+import AddRecipe from '../screens/AddRecipe';
 
 type RootStackParamList = {
     Tabs: undefined;
@@ -27,6 +28,7 @@ type RootStackParamList = {
     ReadRecipe: { recipeId: string };
     ReadRecipeBook: { bookId: string; title: string };
     ReadText: { textId: string };
+    AddRecipe: undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -68,6 +70,7 @@ export default function StackNavigator() {
                                 <ReadRecipe navigation={navigation as any} recipeId={(route as any)?.params?.recipeId} />
                             )}
                         />
+                        <Stack.Screen name='AddRecipe' component={AddRecipe} />
                         <Stack.Screen name='ReadText'
                             children={({ navigation, route }) => (
                                 <ReadText navigation={navigation as any} textId={(route as any)?.params?.textId} />

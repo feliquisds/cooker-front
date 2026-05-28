@@ -8,7 +8,7 @@ export class APIAdapter {
         const basePath = endpoint ? `/api/${endpoint}` : '/api';
 
         this.api = axios.create({
-            baseURL: `http://192.168.15.3:8080${basePath}`
+            baseURL: `http://localhost:8080${basePath}`
         });
 
         this.api.interceptors.request.use(async (config: InternalAxiosRequestConfig) => {

@@ -10,4 +10,5 @@ export interface RecipeBook {
   items: BookComponent[];
   createdAt: string | null;
   updatedAt: string | null;
+  rating: number;
 }

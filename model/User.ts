@@ -10,4 +10,5 @@ export interface User {
   notificationTags: string[];
   favoriteRecipeIds: string[];
   savedBookIds: string[];
+  rating: number;
 }

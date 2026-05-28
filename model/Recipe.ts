@@ -4,6 +4,7 @@ import { IngredientSection } from "./IngredientSection";
 export interface Recipe {
   id: string;
   authorId: string;
+  bookOriginId: string;
   title: string;
   images: string[];
   tags: string[];
@@ -16,4 +17,5 @@ export interface Recipe {
   isPublic: boolean;
   createdAt: string | null; // ISO string vinda do JSON
   updatedAt: string | null;
+  rating: number;
 }

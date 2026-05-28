@@ -35,7 +35,7 @@ export default function Favorited({ navigation }: { navigation: FavoritedNavigat
         <SimpleScreen>
             <TitleWithBackButton navigation={navigation}>Receitas favoritas</TitleWithBackButton>
             {data.length === 0 ? <Subtext style={{ marginTop: 150, textAlign: 'center' }}>Nenhuma receita favoritada ainda</Subtext> : <></>}
-            <RecipeList data={mockRecipes} navigation={navigation} />
+            <RecipeList data={data} navigation={navigation} />
         </SimpleScreen>
     );
 }

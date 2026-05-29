@@ -13,12 +13,6 @@ type FavoritedNavigation = ScreenNavigation<{}> & {
 
 const recipeService = new RecipeService();
 
-const mockRecipes: Recipe[] = [
-    { id: '69f7b394db9505323b334bdb', images: [], tags: ['bolo', 'chocolate', 'doce'], title: 'Bolo de Chocolate', authorId: '123', difficulty: Difficulty.MEDIUM, timeMinutes: 60, portions: 8, descriptionMD: 'Delicioso bolo de chocolate', ingredientSections: [], stepsMD: [], isPublic: true, createdAt: null, updatedAt: null },
-    { id: '2', images: [], tags: ['salada', 'caesar'], title: 'Salada Caesar', authorId: '456', difficulty: Difficulty.EASY, timeMinutes: 30, portions: 4, descriptionMD: 'Saborosa salada Caesar', ingredientSections: [], stepsMD: [], isPublic: true, createdAt: null, updatedAt: null },
-    { id: '3', images: [], tags: ['macarrão', 'bolonhesa'], title: 'Macarrão à Bolonhesa', authorId: '789', difficulty: Difficulty.HARD, timeMinutes: 45, portions: 6, descriptionMD: 'Delicioso macarrão à bolonhesa', ingredientSections: [], stepsMD: [], isPublic: true, createdAt: null, updatedAt: null },
-];
-
 export default function Favorited({ navigation }: { navigation: FavoritedNavigation }) {
     const [data, setData] = useState<Recipe[]>([]);
 

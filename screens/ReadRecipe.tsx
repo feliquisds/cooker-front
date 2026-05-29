@@ -8,6 +8,8 @@ import { Recipe } from "../model/Recipe";
 import { Card, CardElement } from "../components/Cards";
 import RecipeService from "../services/RecipeService";
 import { useEffect, useState } from "react";
+import { getAuthenticatedUserId } from '../services/AuthSession';
+import { PlatformPressable } from '@react-navigation/elements';
 import { useThemeMode } from "../components/ThemeProvider";
 import globalColors from "../styles/Colors";
 import { MaterialCommunityIcons } from "@expo/vector-icons";
@@ -22,6 +24,7 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
     const { theme } = useThemeMode();
     const [recipe, setRecipe] = useState<Recipe | null>(null);
     const [checkedIngredients, setCheckedIngredients] = useState<Set<string>>(new Set());
+    const [isOwner, setIsOwner] = useState(false);
 
     const toggleIngredient = (sectionIndex: number, ingredientIndex: number) => {
         const key = `${sectionIndex}-${ingredientIndex}`;
@@ -38,6 +41,14 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
         const fetchRecipe = async () => {
             const fetchedRecipe = await recipeService.getRecipeById(recipeId);
             setRecipe(fetchedRecipe);
+
+            try {
+                const myId = await getAuthenticatedUserId();
+                setIsOwner(Boolean(myId && fetchedRecipe && fetchedRecipe.authorId === myId));
+            } catch (err) {
+                console.warn('Failed to determine ownership', err);
+                setIsOwner(false);
+            }
         }
 
         fetchRecipe();
@@ -53,7 +64,14 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
 
     return (
         <SimpleScreen>
-            <TitleWithBackButton navigation={navigation}>{recipe.title}</TitleWithBackButton>
+            <Section horizontal spaceBetween>
+                <TitleWithBackButton navigation={navigation}>{recipe.title}</TitleWithBackButton>
+                {isOwner && (
+                    <PlatformPressable onPress={() => (navigation as any).navigate('AddRecipe', { recipeId: recipe.id })}>
+                        <MaterialCommunityIcons name='pencil' size={22} style={{ color: globalColors(theme).text }} />
+                    </PlatformPressable>
+                )}
+            </Section>
             <Section horizontal gap={10}>
                 <DifficultyChip difficulty={recipe.difficulty} />
                 <TimeChip time={recipe.timeMinutes} />

@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect } from 'react';
 import { Section } from '../components/Alignments';
 import { SimpleScreen } from '../components/Interface';
 import { Header, Text, TitleWithBackButton } from '../components/Texts';
@@ -23,7 +23,7 @@ const recipeService = new RecipeService();
 
 type AddRecipeNavigation = ScreenNavigation<{}> & { goBack: () => void };
 
-export default function AddRecipe({ navigation }: { navigation: AddRecipeNavigation }) {
+export default function AddRecipe({ navigation, route }: { navigation: AddRecipeNavigation; route?: any }) {
   const { theme } = useThemeMode();
   const [title, setTitle] = useState('');
   const [tags, setTags] = useState('');
@@ -33,7 +33,42 @@ export default function AddRecipe({ navigation }: { navigation: AddRecipeNavigat
   const [descriptionMD, setDescriptionMD] = useState('');
   const [stepsText, setStepsText] = useState('');
   const [saving, setSaving] = useState(false);
+  const [loading, setLoading] = useState(false);
   const [ingredientSections, setIngredientSections] = useState<IngredientSection[]>([]);
+
+  const recipeId = route?.params?.recipeId as string | undefined;
+  const isEditing = Boolean(recipeId);
+
+  useEffect(() => {
+    if (!isEditing || !recipeId) return;
+
+    let mounted = true;
+    const load = async () => {
+      try {
+        setLoading(true);
+        const recipe = await recipeService.getRecipeById(recipeId);
+        if (!mounted) return;
+
+        setTitle(recipe.title || '');
+        setTags((recipe.tags || []).join(', '));
+        setTimeMinutes(recipe.timeMinutes != null ? String(recipe.timeMinutes) : '');
+        setPortions(recipe.portions != null ? String(recipe.portions) : '');
+        setDifficulty(recipe.difficulty ?? Difficulty.MEDIUM);
+        setDescriptionMD(recipe.descriptionMD || '');
+        setStepsText((recipe.stepsMD || []).join('\n'));
+        setIngredientSections(recipe.ingredientSections || []);
+      } catch (err) {
+        console.error('Failed to load recipe', err);
+        Alert.alert('Erro', 'Não foi possível carregar a receita para edição.');
+      } finally {
+        if (mounted) setLoading(false);
+      }
+    };
+
+    load();
+
+    return () => { mounted = false; };
+  }, [isEditing, recipeId]);
 
   const parseTags = (value: string) => {
     return value
@@ -128,12 +163,16 @@ export default function AddRecipe({ navigation }: { navigation: AddRecipeNavigat
         isPublic: true
       };
 
-      const created = await recipeService.createRecipe(payload);
-      // Navigate to ReadRecipe with created id
-      (navigation as any).navigate('ReadRecipe', { recipeId: created.id });
+      if (isEditing && recipeId) {
+        const updated = await recipeService.updateRecipe(recipeId, payload);
+        (navigation as any).goBack();
+      } else {
+        const created = await recipeService.createRecipe(payload);
+        (navigation as any).navigate('ReadRecipe', { recipeId: created.id });
+      }
     } catch (err) {
-      console.error('Failed to create recipe', err);
-      Alert.alert('Erro', 'Não foi possível criar a receita.');
+      console.error('Failed to save recipe', err);
+      Alert.alert('Erro', isEditing ? 'Não foi possível atualizar a receita.' : 'Não foi possível criar a receita.');
     } finally {
       setSaving(false);
     }
@@ -141,7 +180,7 @@ export default function AddRecipe({ navigation }: { navigation: AddRecipeNavigat
 
   return (
     <SimpleScreen>
-      <TitleWithBackButton navigation={navigation}>Adicionar receita</TitleWithBackButton>
+      <TitleWithBackButton navigation={navigation}>{isEditing ? 'Editar receita' : 'Adicionar receita'}</TitleWithBackButton>
 
       <Section gap={10}>
         <Header>Título</Header>
@@ -183,7 +222,9 @@ export default function AddRecipe({ navigation }: { navigation: AddRecipeNavigat
 
         <Header>Ingredientes</Header>
 
-        {ingredientSections.length === 0 ? (
+        {loading ? (
+          <ActivityIndicator color='#fff' />
+        ) : ingredientSections.length === 0 ? (
           <SlimSimpleButton onPress={addSection}>Adicionar seção de ingredientes</SlimSimpleButton>
         ) : (
           <Draggable
@@ -256,7 +297,7 @@ export default function AddRecipe({ navigation }: { navigation: AddRecipeNavigat
           {saving ? (
             <ActivityIndicator color='#fff' />
           ) : (
-            <BigAccentButton onPress={handleSubmit}>Salvar receita</BigAccentButton>
+            <BigAccentButton onPress={handleSubmit}>{isEditing ? 'Atualizar receita' : 'Salvar receita'}</BigAccentButton>
           )}
         </Section>
       </Section>

@@ -8,7 +8,6 @@ import { useThemeMode } from '../components/ThemeProvider';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Difficulty } from '../model/Difficulty';
 import type { IngredientSection } from '../model/IngredientSection';
-import type { Ingredient } from '../model/Ingredient';
 import RecipeService from '../services/RecipeService';
 import { ActivityIndicator, Alert, View } from 'react-native';
 import DraggableFlatList from 'react-native-draggable-flatlist';
@@ -78,7 +77,7 @@ export default function AddRecipe({ navigation, route }: { navigation: AddRecipe
   };
 
   const addSection = () => {
-    setIngredientSections(prev => [...prev, { title: '', ingredients: [{ quantity: 0, unit: '', name: '' }] }]);
+    setIngredientSections(prev => [...prev, { title: '', ingredients: [''] }]);
   };
 
   const removeSection = (index: number) => {
@@ -86,7 +85,7 @@ export default function AddRecipe({ navigation, route }: { navigation: AddRecipe
   };
 
   const addIngredient = (sectionIndex: number) => {
-    setIngredientSections(prev => prev.map((s, i) => i === sectionIndex ? { ...s, ingredients: [...s.ingredients, { quantity: 0, unit: '', name: '' }] } : s));
+    setIngredientSections(prev => prev.map((s, i) => i === sectionIndex ? { ...s, ingredients: [...s.ingredients, ''] } : s));
   };
 
   const removeIngredient = (sectionIndex: number, ingredientIndex: number) => {
@@ -100,17 +99,10 @@ export default function AddRecipe({ navigation, route }: { navigation: AddRecipe
     setIngredientSections(prev => prev.map((s, i) => i === sectionIndex ? { ...s, title: value } : s));
   };
 
-  const updateIngredientField = (sectionIndex: number, ingredientIndex: number, field: keyof Ingredient, value: string) => {
+  const updateIngredientText = (sectionIndex: number, ingredientIndex: number, value: string) => {
     setIngredientSections(prev => prev.map((s, i) => {
       if (i !== sectionIndex) return s;
-      const ingredients = s.ingredients.map((ing, j) => {
-        if (j !== ingredientIndex) return ing;
-        if (field === 'quantity') {
-          const num = Number(value);
-          return { ...ing, quantity: Number.isNaN(num) ? 0 : num };
-        }
-        return { ...ing, [field]: value } as Ingredient;
-      });
+      const ingredients = s.ingredients.map((ing, j) => (j === ingredientIndex ? value : ing));
       return { ...s, ingredients };
     }));
   };
@@ -138,7 +130,7 @@ export default function AddRecipe({ navigation, route }: { navigation: AddRecipe
     }));
   };
 
-  const updateIngredientsOrder = (sectionIndex: number, newIngredients: Ingredient[]) => {
+  const updateIngredientsOrder = (sectionIndex: number, newIngredients: string[]) => {
     setIngredientSections(prev => prev.map((s, i) => i === sectionIndex ? { ...s, ingredients: newIngredients } : s));
   };
 
@@ -250,27 +242,13 @@ export default function AddRecipe({ navigation, route }: { navigation: AddRecipe
                 </Section>
 
                 <Section gap={8}>
-                  {section.ingredients.map((ing: Ingredient, ingredientIndex: number) => (
+                  {section.ingredients.map((ingredient: string, ingredientIndex: number) => (
                     <Section key={`ing-${sectionIndex}-${ingredientIndex}`} horizontal gap={8} centerVertical>
-                      <MaterialCommunityIcons name='drag-vertical' size={18} style={{ color: globalColors(theme).subtext, marginRight: 6 }} />
-                      <Input
-                        style={{ flex: 0.6 }}
-                        placeholder='Qtd'
-                        value={ing.quantity != null ? String(ing.quantity) : ''}
-                        onChangeText={(v) => updateIngredientField(sectionIndex, ingredientIndex, 'quantity', v)}
-                        keyboardType='numeric'
-                      />
-                      <Input
-                        style={{ width: 80 }}
-                        placeholder='Un'
-                        value={ing.unit}
-                        onChangeText={(v) => updateIngredientField(sectionIndex, ingredientIndex, 'unit', v)}
-                      />
                       <Input
                         style={{ flex: 1 }}
-                        placeholder='Nome'
-                        value={ing.name}
-                        onChangeText={(v) => updateIngredientField(sectionIndex, ingredientIndex, 'name', v)}
+                        placeholder='Ingrediente'
+                        value={ingredient}
+                        onChangeText={(v) => updateIngredientText(sectionIndex, ingredientIndex, v)}
                       />
                       <View style={{ flexDirection: 'row', alignItems: 'center' }}>
                         <PlatformPressable onPress={() => moveIngredient(sectionIndex, ingredientIndex, -1)} disabled={ingredientIndex === 0}>

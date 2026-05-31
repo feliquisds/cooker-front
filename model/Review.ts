@@ -8,5 +8,5 @@ export interface Review {
   contentMD: string;
   images: string[];
   rating: number;   // Geralmente 1 a 5
-  aiStatus: Status; // Usando o Enum Status definido acima
+  aiStatus: Status;
 }

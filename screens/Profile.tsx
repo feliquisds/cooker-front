@@ -209,7 +209,7 @@ function LoggedInScreen({navigation, setLoggedIn}: ChildProps) {
             <Card>
                 <CardElement horizontal gap={15}>
                     <Image
-                        source={avatarSource ?? require('../assets/default-avatar.png')}
+                        source={avatarSource ?? (theme === 'light' ? require('../assets/default-avatar-black.png') : require('../assets/default-avatar-white.png'))}
                         style={localStyles.profilePicture}
                     />
                     <Section style={{ alignSelf: 'center' }}>

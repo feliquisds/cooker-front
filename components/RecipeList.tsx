@@ -28,7 +28,7 @@ export function RecipeList({data, navigation}: {data: Recipe[], navigation: Reci
                         </Section>
                         <Subtext>{item.tags.map(tag => `#${tag}`).join(' ')}</Subtext>
                     </Section>
-                    {item.images.length > 0 && <Image source={{ uri: item.images[0] }} style={imageStyle} />}
+                    {item.images != null && item.images.length > 0 && <Image source={{ uri: item.images[0] }} style={imageStyle} />}
                 </CardElement>
             </Card>
         </PlatformPressable>

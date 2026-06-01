@@ -1,4 +1,4 @@
-import { StyleSheet, type TextStyle, type ViewStyle } from 'react-native';
+import { Platform, StyleSheet, type TextStyle, type ViewStyle } from 'react-native';
 import globalColors from './Colors';
 import type { ThemeMode } from './Theme';
 
@@ -90,14 +90,20 @@ export default function globalStyles(force: ThemeMode | '' = ''): GlobalStyleMap
         // interface
         scrollArea: {
             flex: 1,
+            minHeight: 0,
+            height: Platform.OS === 'web' ? '100vh' as any : '100%',
             padding: globalStyleVariables.screenMargin
         },
         staticArea: {
             flex: 1,
+            minHeight: 0,
+            height: Platform.OS === 'web' ? '100vh' as any : '100%',
             backgroundColor: globalColors(force).background
         },
         screen: {
             flex: 1,
+            minHeight: 0,
+            height: Platform.OS === 'web' ? '100vh' as any : '100%',
             padding: globalStyleVariables.screenMargin,
             backgroundColor: globalColors(force).background
         },

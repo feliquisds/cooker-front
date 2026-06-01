@@ -119,7 +119,7 @@ export default function ReadRecipeBook({ navigation, bookId, title }: { navigati
                         <Card>
                             <CardElement horizontal gap={15} centerVertical>
                                 <Image
-                                    source={owner.avatarUrl ? { uri: owner.avatarUrl } : require('../assets/default-avatar.png')}
+                                    source={owner.avatarUrl ? { uri: owner.avatarUrl } : (theme === 'light' ? require('../assets/default-avatar-black.png') : require('../assets/default-avatar-white.png'))}
                                     style={ownerAvatarStyle}
                                 />
                                 <Section style={{ flex: 1 }}>

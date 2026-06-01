@@ -33,9 +33,9 @@ export function TitleWithBackButton({ children, style, navigation }: TitleWithBa
     const { theme } = useThemeMode();
 
     return (
-        <Section horizontal gap={10}>
+        <Section horizontal gap={10} style={{ flex: 1, minWidth: 0, alignItems: 'center' }}>
             <BackButton navigation={navigation} />
-            <ReactText style={[globalStyles(theme).title, style]}>{children}</ReactText>
+            <ReactText style={[globalStyles(theme).title, { flex: 1, flexShrink: 1, flexWrap: 'wrap' }, style]}>{children}</ReactText>
         </Section>
     );
 }

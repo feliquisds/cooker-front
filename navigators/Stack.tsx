@@ -15,6 +15,7 @@ import ReadRecipe from '../screens/ReadRecipe';
 import ReadRecipeBook from '../screens/ReadRecipeBook';
 import ReadText from '../screens/ReadText';
 import AddRecipe from '../screens/AddRecipe';
+import { View } from 'react-native';
 
 type RootStackParamList = {
     Tabs: undefined;
@@ -40,44 +41,46 @@ export default function StackNavigator() {
         <SafeAreaProvider>
             <SafeAreaView style={globalStyles().staticArea}>
                 <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
-                <NavigationContainer>
-                    <Stack.Navigator
-                        initialRouteName='Tabs'
-                        screenOptions={{
-                            headerShown: false,
-                            animation: 'slide_from_right'
-                        }}
-                    >
-                        <Stack.Screen name='Tabs' component={Tabs} />
-                        <Stack.Screen name='Recovery' component={Recovery} />
-                        <Stack.Screen name='Home' component={Home} />
-                        <Stack.Screen name='Saved' component={Saved} />
-                        <Stack.Screen name='Search' component={Search} />
-                        <Stack.Screen name='Profile' component={Profile} />
-                        <Stack.Screen name='Favorited' component={Favorited} />
-                        <Stack.Screen
-                            name='ReadRecipeBook'
-                            children={({ navigation, route }) => (
-                                <ReadRecipeBook
-                                    navigation={navigation as any}
-                                    bookId={(route as any)?.params?.bookId}
-                                    title={(route as any)?.params?.title}
-                                />
-                            )}
-                        />
-                        <Stack.Screen name='ReadRecipe'
-                            children={({ navigation, route }) => (
-                                <ReadRecipe navigation={navigation as any} recipeId={(route as any)?.params?.recipeId} />
-                            )}
-                        />
-                        <Stack.Screen name='AddRecipe' component={AddRecipe} />
-                        <Stack.Screen name='ReadText'
-                            children={({ navigation, route }) => (
-                                <ReadText navigation={navigation as any} textId={(route as any)?.params?.textId} />
-                            )}
-                        />
-                    </Stack.Navigator>
-                </NavigationContainer>
+                <View style={{ flex: 1, minHeight: 0 }}>
+                    <NavigationContainer>
+                        <Stack.Navigator
+                            initialRouteName='Tabs'
+                            screenOptions={{
+                                headerShown: false,
+                                animation: 'slide_from_right'
+                            }}
+                        >
+                            <Stack.Screen name='Tabs' component={Tabs} />
+                            <Stack.Screen name='Recovery' component={Recovery} />
+                            <Stack.Screen name='Home' component={Home} />
+                            <Stack.Screen name='Saved' component={Saved} />
+                            <Stack.Screen name='Search' component={Search} />
+                            <Stack.Screen name='Profile' component={Profile} />
+                            <Stack.Screen name='Favorited' component={Favorited} />
+                            <Stack.Screen
+                                name='ReadRecipeBook'
+                                children={({ navigation, route }) => (
+                                    <ReadRecipeBook
+                                        navigation={navigation as any}
+                                        bookId={(route as any)?.params?.bookId}
+                                        title={(route as any)?.params?.title}
+                                    />
+                                )}
+                            />
+                            <Stack.Screen name='ReadRecipe'
+                                children={({ navigation, route }) => (
+                                    <ReadRecipe navigation={navigation as any} recipeId={(route as any)?.params?.recipeId} />
+                                )}
+                            />
+                            <Stack.Screen name='AddRecipe' component={AddRecipe} />
+                            <Stack.Screen name='ReadText'
+                                children={({ navigation, route }) => (
+                                    <ReadText navigation={navigation as any} textId={(route as any)?.params?.textId} />
+                                )}
+                            />
+                        </Stack.Navigator>
+                    </NavigationContainer>
+                </View>
             </SafeAreaView>
         </SafeAreaProvider>
     );

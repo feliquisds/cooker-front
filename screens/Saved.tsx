@@ -40,13 +40,15 @@ function formatDate(value?: string | null): string {
 function SavedBookCard({
     book,
     navigation,
-    authorAvatarUrl
+    authorAvatarUrl,
+    theme
 }: {
     book: RecipeBook;
     navigation: SavedNavigation;
     authorAvatarUrl?: string | null;
+    theme: 'light' | 'dark';
 }) {
-    const authorAvatar = authorAvatarUrl ? { uri: authorAvatarUrl } : require('../assets/default-avatar.png');
+    const authorAvatar = authorAvatarUrl ? { uri: authorAvatarUrl } : (theme === 'light' ? require('../assets/default-avatar-black.png') : require('../assets/default-avatar-white.png'));
     const updatedAt = formatDate(book.updatedAt);
 
     return (
@@ -120,6 +122,7 @@ export default function Saved({ navigation }: { navigation: SavedNavigation }) {
                                 book={book}
                                 navigation={navigation}
                                 authorAvatarUrl={authorAvatars[book.ownerId]}
+                                theme={theme}
                             />
                         ))}
                     </Section>

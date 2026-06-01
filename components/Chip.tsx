@@ -70,7 +70,7 @@ export function PortionChip({ portions }: { portions: number }) {
     return (
         <Section centerVertical horizontal gap={5} style={globalStyles(theme).chip}>
             <MaterialCommunityIcons name="silverware-fork-knife" size={14} color={globalColors(theme).subtext} />
-            <Subtext>{portions} porções</Subtext>
+            <Subtext>{portions} {portions === 1 ? 'porção' : 'porções'}</Subtext>
         </Section>
     );
 }

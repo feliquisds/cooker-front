@@ -1,11 +1,9 @@
 import { useState, useEffect } from 'react';
-import { ActivityIndicator, Image, ImageStyle, View } from 'react-native';
-import { PlatformPressable } from '@react-navigation/elements';
+import { ActivityIndicator } from 'react-native';
 import { Section } from '../components/Alignments';
-import { Title, Subtext, Text } from '../components/Texts';
+import { Title, Subtext } from '../components/Texts';
 import { SimpleScreen } from '../components/Interface';
 import { SearchBox } from '../components/Inputs';
-import { Card, CardElement } from '../components/Cards';
 import { ScreenNavigation } from '../components/Types';
 import RecipeService from '../services/RecipeService';
 import { Recipe } from '../model/Recipe';
@@ -19,45 +17,19 @@ type SearchNavigation = ScreenNavigation<{
 
 const recipeService = new RecipeService();
 
-// Mapeamento de dificuldade para exibição no card
-const difficultyMap: Record<string, string> = {
-    EASY: 'Fácil',
-    MEDIUM: 'Médio',
-    HARD: 'Difícil'
-};
-
-// Componente do Card de Resultado da Busca
-function SearchResultCard({
-    recipe,
-    navigation
-}: {
-    recipe: Recipe;
-    navigation: SearchNavigation;
-}) {
-    const imageUrl = recipe.images && recipe.images.length > 0 ? recipe.images[0] : null;
-
-    return (
-        <PlatformPressable onPress={() => navigation.navigate('ReadRecipe', { recipeId: recipe.id, title: recipe.title })}>
-            <Card>
-                <CardElement horizontal gap={16} centerVertical>
-                    {imageUrl ? (
-                        <Image source={{ uri: imageUrl }} style={localStyles.recipeImage} />
-                    ) : (
-                        <View style={[localStyles.recipeImage, { backgroundColor: '#E0E0E0' }]} />
-                    )}
-                    
-                    <Section style={{ flex: 1 }} gap={4}>
-                        <Text style={{ fontSize: 16, fontWeight: 'bold', color: '#1A1A1A' }}>
-                            {recipe.title}
-                        </Text>
-                        <Subtext style={{ fontSize: 13, color: '#888888' }}>
-                            {recipe.difficulty ? difficultyMap[recipe.difficulty] : 'Sem dificuldade'} • {recipe.timeMinutes ? `${recipe.timeMinutes} min` : '-- min'}
-                        </Subtext>
-                    </Section>
-                </CardElement>
-            </Card>
-        </PlatformPressable>
+function parseSearchQuery(input: string) {
+    const tags = Array.from(
+        new Set(
+            [...input.matchAll(/#([\p{L}\p{N}_-]+)/gu)].map((match) => match[1])
+        )
     );
+
+    const title = input
+        .replace(/#([\p{L}\p{N}_-]+)/gu, ' ')
+        .replace(/\s+/g, ' ')
+        .trim();
+
+    return { title, tags };
 }
 
 export default function Search({ navigation }: { navigation: SearchNavigation }) {
@@ -80,7 +52,9 @@ export default function Search({ navigation }: { navigation: SearchNavigation })
     // Efeito de Busca: Disparado apenas quando a debouncedQuery muda
     useEffect(() => {
         const fetchSearchResults = async () => {
-            if (!debouncedQuery.trim()) {
+            const { title, tags } = parseSearchQuery(debouncedQuery);
+
+            if (!title && tags.length === 0) {
                 setResults([]);
                 setHasSearched(false);
                 return;
@@ -89,9 +63,9 @@ export default function Search({ navigation }: { navigation: SearchNavigation })
             try {
                 setLoading(true);
                 setHasSearched(true);
-                
-                // Passamos undefined/as any para os parâmetros não obrigatórios para focar na busca por título
-                const data = await recipeService.searchRecipes(debouncedQuery, [], undefined as any, '');
+
+                // A busca usa o texto restante como título e extrai hashtags para o parâmetro de tags.
+                const data = await recipeService.searchRecipes(title, tags, undefined as any, '');
                 setResults(data);
             } catch (error) {
                 console.error('Erro ao buscar receitas:', error);
@@ -135,11 +109,3 @@ return (
         </SimpleScreen>
     );
 }
-
-const localStyles = {
-    recipeImage: {
-        width: 64,
-        height: 64,
-        borderRadius: 12
-    } as ImageStyle
-};

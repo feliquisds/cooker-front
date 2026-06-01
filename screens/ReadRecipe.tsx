@@ -56,14 +56,14 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
 
     if (!recipe) {
         return (
-            <SimpleScreen>
+            <SimpleScreen scrollPadding>
                 <TitleWithBackButton navigation={navigation}></TitleWithBackButton>
             </SimpleScreen>
         );
     }
 
     return (
-        <SimpleScreen>
+        <SimpleScreen scrollPadding>
             <Section horizontal spaceBetween>
                 <TitleWithBackButton navigation={navigation}>{recipe.title}</TitleWithBackButton>
                 {isOwner && (
@@ -103,7 +103,12 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
                                                     size={20}
                                                     color={globalColors(theme).text}
                                                 />
-                                                <Text style={isChecked ? { textDecorationLine: 'line-through', opacity: 0.5 } : {}}>
+                                                <Text
+                                                    style={[
+                                                        { flex: 1, flexShrink: 1 },
+                                                        isChecked ? { textDecorationLine: 'line-through', opacity: 0.5 } : {}
+                                                    ]}
+                                                >
                                                     {ingredient}
                                                 </Text>
                                             </Section>
@@ -123,7 +128,7 @@ export default function ReadRecipe({ navigation, recipeId }: { navigation: ReadR
                     {recipe.stepsMD.map((step, index) => (
                         <Section centerVertical horizontal gap={10} key={index}>
                             <Header accented>{index + 1}.</Header>
-                            <Text>{step}</Text>
+                            <Text style={{ flex: 1, flexShrink: 1 }}>{step}</Text>
                         </Section>
                     ))}
                 </CardElement>

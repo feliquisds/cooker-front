@@ -1,15 +1,18 @@
 import { useState, useEffect } from 'react';
-import { ActivityIndicator } from 'react-native';
+import { ActivityIndicator, FlatList, Image, type ImageStyle, type ListRenderItem } from 'react-native';
 import { Section } from '../components/Alignments';
 import { Title, Subtext } from '../components/Texts';
-import { SimpleScreen } from '../components/Interface';
 import { SearchBox } from '../components/Inputs';
 import { ScreenNavigation } from '../components/Types';
 import RecipeService from '../services/RecipeService';
 import { Recipe } from '../model/Recipe';
 import { useThemeMode } from '../components/ThemeProvider';
 import globalColors from '../styles/Colors';
-import { RecipeList } from '../components/RecipeList';
+import globalStyles from '../styles/Styles';
+import { PlatformPressable } from '@react-navigation/elements';
+import { Card, CardElement } from '../components/Cards';
+import { Text } from '../components/Texts';
+import { DifficultyChip, PortionChip, TimeChip } from '../components/Chip';
 
 type SearchNavigation = ScreenNavigation<{
     ReadRecipe: { recipeId: string; title: string };
@@ -34,6 +37,7 @@ function parseSearchQuery(input: string) {
 
 export default function Search({ navigation }: { navigation: SearchNavigation }) {
     const { theme } = useThemeMode();
+    const styles = globalStyles(theme);
     const [query, setQuery] = useState('');
     const [debouncedQuery, setDebouncedQuery] = useState('');
     const [results, setResults] = useState<Recipe[]>([]);
@@ -78,34 +82,60 @@ export default function Search({ navigation }: { navigation: SearchNavigation })
         void fetchSearchResults();
     }, [debouncedQuery]);
 
-return (
-        <SimpleScreen tabScreen>
-            {/* Mantemos a sua estrutura original com o gap={15} aqui */}
-            <Section gap={15}>
-                <Title>Buscar</Title>
-                <SearchBox
-                    onChangeText={setQuery}
-                    value={query} 
-                />
-            </Section>
+    const renderRecipe: ListRenderItem<Recipe> = ({ item }) => (
+        <PlatformPressable onPress={() => navigation.navigate('ReadRecipe', { recipeId: item.id, title: item.title })}>
+            <Card>
+                <CardElement gap={10}>
+                    <Section>
+                        <Text>{item.title}</Text>
+                    </Section>
+                    <Section gap={5}>
+                        <Section horizontal gap={10}>
+                            <DifficultyChip difficulty={item.difficulty} />
+                            <TimeChip time={item.timeMinutes} />
+                            <PortionChip portions={item.portions} />
+                        </Section>
+                        <Subtext>{item.tags.map(tag => `#${tag}`).join(' ')}</Subtext>
+                    </Section>
+                    {item.images != null && item.images.length > 0 && <Image source={{ uri: item.images[0] }} style={imageStyle} />}
+                </CardElement>
+            </Card>
+        </PlatformPressable>
+    );
 
-            {/* Criamos uma nova Section separada só para os resultados, com uma margem no topo */}
-            <Section gap={12} style={{ marginTop: 24, paddingBottom: 24 }}>
-                {loading ? (
+    return (
+        <FlatList
+            style={styles.screen}
+            data={results}
+            keyExtractor={(item) => item.id}
+            renderItem={renderRecipe}
+            ListHeaderComponent={
+                <Section gap={15} style={{ marginBottom: 24 }}>
+                    <Title>Buscar</Title>
+                    <SearchBox
+                        onChangeText={setQuery}
+                        value={query}
+                    />
+                </Section>
+            }
+            ListEmptyComponent={
+                loading ? (
                     <Section centerVertical style={{ minHeight: 120 }}>
                         <ActivityIndicator color={globalColors(theme).accent[0]} size="large" />
                     </Section>
-                ) : hasSearched && results.length === 0 ? (
+                ) : hasSearched ? (
                     <Section centerVertical style={{ minHeight: 120 }}>
                         <Subtext style={{ textAlign: 'center' }}>Nenhuma receita encontrada para "{debouncedQuery}"</Subtext>
                     </Section>
-                ) : (
-                    <RecipeList
-                            data={results}
-                            navigation={navigation}
-                        />
-                )}
-            </Section>
-        </SimpleScreen>
+                ) : null
+            }
+            contentContainerStyle={[{ gap: 15 }, styles.tabScreenPadding, { paddingBottom: 24 }]}
+        />
     );
 }
+
+const imageStyle: ImageStyle = {
+    width: '100%',
+    height: 100,
+    borderRadius: 15,
+};

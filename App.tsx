@@ -1,5 +1,6 @@
 import { useEffect } from 'react';
 import { Platform } from 'react-native';
+import { GestureHandlerRootView } from 'react-native-gesture-handler';
 import Stack from './navigators/Stack';
 import { ThemeProvider } from './components/ThemeProvider';
 import { useThemeMode } from './components/ThemeProvider';
@@ -45,9 +46,11 @@ function WebRootStyles() {
 
 export default function App() {
     return (
-        <ThemeProvider>
-            <WebRootStyles />
-            <Stack />
-        </ThemeProvider>
+        <GestureHandlerRootView style={{ flex: 1 }}>
+            <ThemeProvider>
+                <WebRootStyles />
+                <Stack />
+            </ThemeProvider>
+        </GestureHandlerRootView>
     );
 }

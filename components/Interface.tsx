@@ -1,5 +1,5 @@
 import { ReactNode, useState } from 'react';
-import { ImageBackground, type ImageResizeMode, type ImageSourcePropType, ScrollView, View, type StyleProp, type ViewStyle, StyleSheet, RefreshControl, Platform } from 'react-native';
+import { ImageBackground, type ImageResizeMode, type ImageSourcePropType, ScrollView, View, type StyleProp, type ViewStyle, StyleSheet, RefreshControl, Platform, KeyboardAvoidingView } from 'react-native';
 import { getGap, Section } from './Alignments';
 import globalStyles from '../styles/Styles';
 import { PlatformPressable } from '@react-navigation/elements';
@@ -38,7 +38,11 @@ export function SimpleScreen({ children, style, containerStyle, overlay, overlay
     };
 
     return (
-        <View style={[styles.screen, { position: 'relative' }, style]}>
+        <KeyboardAvoidingView
+            style={[styles.screen, { position: 'relative' }, style]}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={0}
+        >
             <ScrollView
                 style={{ flex: 1, minHeight: 0 }}
                 contentContainerStyle={[
@@ -49,6 +53,8 @@ export function SimpleScreen({ children, style, containerStyle, overlay, overlay
                     tabScreen ? tabScreenPaddingStyle : {}
                 ]}
                 scrollEnabled={true}
+                keyboardShouldPersistTaps='handled'
+                keyboardDismissMode='on-drag'
                 refreshControl={
                     Platform.OS !== 'web' && onRefresh ? (
                         <RefreshControl
@@ -67,7 +73,7 @@ export function SimpleScreen({ children, style, containerStyle, overlay, overlay
                     {overlay}
                 </View>
             ) : null}
-        </View>
+        </KeyboardAvoidingView>
     );
 }
 
@@ -95,30 +101,38 @@ export function ImageScreen({ children, style, containerStyle, fill, scrollPaddi
     };
 
     return (
-        <ImageBackground source={source} resizeMode={resizeMode} style={[styles.staticArea, { width: '100%', height: '100%' }]}>
-            <ScrollView
-            style={[styles.scrollArea, style]}
-                contentContainerStyle={[
-                    getGap(15),
-                    containerStyle,
-                    fill ? { flexGrow: 1 } : {},
-                    scrollPadding ? scrollPaddingStyle : {},
-                    tabScreen ? tabScreenPaddingStyle : {}
-                ]}
-                scrollEnabled={true}
-                refreshControl={
-                    Platform.OS !== 'web' && onRefresh ? (
-                        <RefreshControl
-                            refreshing={refreshing}
-                            onRefresh={handleRefresh}
-                            progressViewOffset={0}
-                        />
-                    ) : undefined
-                }
-            >
-                {children}
-            </ScrollView>
-        </ImageBackground>
+        <KeyboardAvoidingView
+            style={[styles.staticArea, { width: '100%', height: '100%' }, style]}
+            behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+            keyboardVerticalOffset={0}
+        >
+            <ImageBackground source={source} resizeMode={resizeMode} style={[styles.staticArea, { width: '100%', height: '100%' }]}>
+                <ScrollView
+                    style={[styles.scrollArea, style]}
+                    contentContainerStyle={[
+                        getGap(15),
+                        containerStyle,
+                        fill ? { flexGrow: 1 } : {},
+                        scrollPadding ? scrollPaddingStyle : {},
+                        tabScreen ? tabScreenPaddingStyle : {}
+                    ]}
+                    scrollEnabled={true}
+                    keyboardShouldPersistTaps='handled'
+                    keyboardDismissMode='on-drag'
+                    refreshControl={
+                        Platform.OS !== 'web' && onRefresh ? (
+                            <RefreshControl
+                                refreshing={refreshing}
+                                onRefresh={handleRefresh}
+                                progressViewOffset={0}
+                            />
+                        ) : undefined
+                    }
+                >
+                    {children}
+                </ScrollView>
+            </ImageBackground>
+        </KeyboardAvoidingView>
     );
 
 }

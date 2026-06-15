@@ -59,12 +59,13 @@ function StepRow({
   showDragHandle?: boolean;
 }) {
   const { theme } = useThemeMode();
+  const stepNumber = Number.isFinite(index) ? index + 1 : 1;
 
   return (
     <Section horizontal gap={10} centerVertical>
       <Input
         style={{ flex: 1 }}
-        placeholder={`Passo ${index + 1}`}
+        placeholder={`Passo ${stepNumber}`}
         value={step.text}
         onChangeText={onChange}
         multiline
@@ -399,8 +400,8 @@ export default function AddRecipe({ navigation, route }: { navigation: AddRecipe
     }
   };
 
-  const ScreenWrapper: any = Platform.OS === 'web' ? SimpleScreen : NestableScrollContainer;
-  const useDragAndDrop = Platform.OS !== 'web';
+  const ScreenWrapper: any = Platform.OS === 'ios' ? NestableScrollContainer : SimpleScreen;
+  const useDragAndDrop = Platform.OS === 'ios';
 
   return (
     <ScreenWrapper
@@ -411,7 +412,7 @@ export default function AddRecipe({ navigation, route }: { navigation: AddRecipe
     >
       <TitleWithBackButton navigation={navigation}>{isEditing ? 'Editar receita' : 'Adicionar receita'}</TitleWithBackButton>
 
-      <Section gap={10}>
+        <Section gap={10}>
         <Header>Título</Header>
         <Input placeholder='Título' value={title} onChangeText={setTitle} />
 
@@ -438,9 +439,7 @@ export default function AddRecipe({ navigation, route }: { navigation: AddRecipe
 
         <Header>Modo de preparo (adicione, remova e reordene os passos)</Header>
         <Section gap={10}>
-          {steps.length === 0 ? (
-            <SlimSimpleButton onPress={addStep}>Adicionar passo</SlimSimpleButton>
-          ) : (
+          {steps.length !== 0 && (
             useDragAndDrop ? (
               <Draggable
                 data={steps}
@@ -481,124 +480,126 @@ export default function AddRecipe({ navigation, route }: { navigation: AddRecipe
 
         {loading ? (
           <ActivityIndicator color='#fff' />
-        ) : ingredientSections.length === 0 ? (
-          <SlimSimpleButton onPress={addSection}>Adicionar seção de ingredientes</SlimSimpleButton>
         ) : (
-          useDragAndDrop ? (
-            <Draggable
-              data={ingredientSections}
-              keyExtractor={(item: any, index: number) => `section-${index}`}
-              onDragEnd={(params: any) => setIngredientSections(params.data)}
-              renderItem={({ item: section, index: sectionIndex, drag }: any) => (
-                <Section key={`section-${sectionIndex}`} gap={10}>
-                  <Section horizontal gap={10}>
-                    <Input
-                      placeholder='Título da seção (opcional)'
-                      value={section.title}
-                      onChangeText={(v) => updateSectionTitle(sectionIndex, v)}
-                      multiline
-                      autoGrow
-                      minHeight={52}
-                    />
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <PlatformPressable onLongPress={drag}>
-                        <MaterialCommunityIcons name='drag' size={20} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
-                      </PlatformPressable>
-                      <PlatformPressable onPress={() => removeSection(sectionIndex)}>
-                        <MaterialCommunityIcons name='trash-can-outline' size={24} style={{ color: globalColors(theme).subtext, marginLeft: 6 }} />
-                      </PlatformPressable>
-                    </View>
-                  </Section>
+          <Section gap={10}>
+            {useDragAndDrop ? (
+              <Draggable
+                data={ingredientSections}
+                keyExtractor={(item: any, index: number) => `section-${index}`}
+                onDragEnd={(params: any) => setIngredientSections(params.data)}
+                renderItem={({ item: section, index: sectionIndex, drag }: any) => (
+                  <Section key={`section-${sectionIndex}`} gap={10}>
+                    <Section horizontal gap={10}>
+                      <Input
+                        placeholder='Título da seção (opcional)'
+                        value={section.title}
+                        onChangeText={(v) => updateSectionTitle(sectionIndex, v)}
+                        multiline
+                        autoGrow
+                        minHeight={52}
+                      />
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <PlatformPressable onLongPress={drag}>
+                          <MaterialCommunityIcons name='drag' size={20} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
+                        </PlatformPressable>
+                        <PlatformPressable onPress={() => removeSection(sectionIndex)}>
+                          <MaterialCommunityIcons name='trash-can-outline' size={24} style={{ color: globalColors(theme).subtext, marginLeft: 6 }} />
+                        </PlatformPressable>
+                      </View>
+                    </Section>
 
-                  <Section gap={8}>
-                    {section.ingredients.map((ingredient: string, ingredientIndex: number) => (
-                      <Section key={`ing-${sectionIndex}-${ingredientIndex}`} horizontal gap={8} centerVertical>
-                        <Input
-                          style={{ flex: 1 }}
-                          placeholder='Ingrediente'
-                          value={ingredient}
-                          onChangeText={(v) => updateIngredientText(sectionIndex, ingredientIndex, v)}
-                          multiline
-                          autoGrow
-                          minHeight={52}
-                        />
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <PlatformPressable onPress={() => moveIngredient(sectionIndex, ingredientIndex, -1)} disabled={ingredientIndex === 0}>
-                            <MaterialCommunityIcons name='chevron-up' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
-                          </PlatformPressable>
-                          <PlatformPressable onPress={() => moveIngredient(sectionIndex, ingredientIndex, 1)} disabled={ingredientIndex === section.ingredients.length - 1}>
-                            <MaterialCommunityIcons name='chevron-down' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
-                          </PlatformPressable>
-                          <PlatformPressable onPress={() => removeIngredient(sectionIndex, ingredientIndex)}>
-                            <MaterialCommunityIcons name='close' size={20} style={{ color: globalColors(theme).subtext }} />
-                          </PlatformPressable>
-                        </View>
-                      </Section>
-                    ))}
+                    <Section gap={8}>
+                      {section.ingredients.map((ingredient: string, ingredientIndex: number) => (
+                        <Section key={`ing-${sectionIndex}-${ingredientIndex}`} horizontal gap={8} centerVertical>
+                          <Input
+                            style={{ flex: 1 }}
+                            placeholder='Ingrediente'
+                            value={ingredient}
+                            onChangeText={(v) => updateIngredientText(sectionIndex, ingredientIndex, v)}
+                            multiline
+                            autoGrow
+                            minHeight={52}
+                          />
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <PlatformPressable onPress={() => moveIngredient(sectionIndex, ingredientIndex, -1)} disabled={ingredientIndex === 0}>
+                              <MaterialCommunityIcons name='chevron-up' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
+                            </PlatformPressable>
+                            <PlatformPressable onPress={() => moveIngredient(sectionIndex, ingredientIndex, 1)} disabled={ingredientIndex === section.ingredients.length - 1}>
+                              <MaterialCommunityIcons name='chevron-down' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
+                            </PlatformPressable>
+                            <PlatformPressable onPress={() => removeIngredient(sectionIndex, ingredientIndex)}>
+                              <MaterialCommunityIcons name='close' size={20} style={{ color: globalColors(theme).subtext }} />
+                            </PlatformPressable>
+                          </View>
+                        </Section>
+                      ))}
 
-                    <SlimSimpleButton onPress={() => addIngredient(sectionIndex)}>+ Ingrediente</SlimSimpleButton>
+                      <SlimSimpleButton onPress={() => addIngredient(sectionIndex)}>+ Ingrediente</SlimSimpleButton>
+                    </Section>
                   </Section>
-                </Section>
-              )}
-            />
-          ) : (
-            <Section gap={10}>
-              {ingredientSections.map((section, sectionIndex) => (
-                <Section key={`section-${sectionIndex}`} gap={10}>
-                  <Section horizontal gap={10}>
-                    <Input
-                      placeholder='Título da seção (opcional)'
-                      value={section.title}
-                      onChangeText={(v) => updateSectionTitle(sectionIndex, v)}
-                      multiline
-                      autoGrow
-                      minHeight={52}
-                    />
-                    <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                      <PlatformPressable onPress={() => moveSection(sectionIndex, -1)} disabled={sectionIndex === 0}>
-                        <MaterialCommunityIcons name='chevron-up' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
-                      </PlatformPressable>
-                      <PlatformPressable onPress={() => moveSection(sectionIndex, 1)} disabled={sectionIndex === ingredientSections.length - 1}>
-                        <MaterialCommunityIcons name='chevron-down' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
-                      </PlatformPressable>
-                      <PlatformPressable onPress={() => removeSection(sectionIndex)}>
-                        <MaterialCommunityIcons name='trash-can-outline' size={24} style={{ color: globalColors(theme).subtext, marginLeft: 6 }} />
-                      </PlatformPressable>
-                    </View>
-                  </Section>
+                )}
+              />
+            ) : (
+              <Section gap={10}>
+                {ingredientSections.map((section, sectionIndex) => (
+                  <Section key={`section-${sectionIndex}`} gap={10}>
+                    <Section horizontal gap={10}>
+                      <Input
+                        placeholder='Título da seção (opcional)'
+                        value={section.title}
+                        onChangeText={(v) => updateSectionTitle(sectionIndex, v)}
+                        multiline
+                        autoGrow
+                        minHeight={52}
+                      />
+                      <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                        <PlatformPressable onPress={() => moveSection(sectionIndex, -1)} disabled={sectionIndex === 0}>
+                          <MaterialCommunityIcons name='chevron-up' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
+                        </PlatformPressable>
+                        <PlatformPressable onPress={() => moveSection(sectionIndex, 1)} disabled={sectionIndex === ingredientSections.length - 1}>
+                          <MaterialCommunityIcons name='chevron-down' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
+                        </PlatformPressable>
+                        <PlatformPressable onPress={() => removeSection(sectionIndex)}>
+                          <MaterialCommunityIcons name='trash-can-outline' size={24} style={{ color: globalColors(theme).subtext, marginLeft: 6 }} />
+                        </PlatformPressable>
+                      </View>
+                    </Section>
 
-                  <Section gap={8}>
-                    {section.ingredients.map((ingredient: string, ingredientIndex: number) => (
-                      <Section key={`ing-${sectionIndex}-${ingredientIndex}`} horizontal gap={8} centerVertical>
-                        <Input
-                          style={{ flex: 1 }}
-                          placeholder='Ingrediente'
-                          value={ingredient}
-                          onChangeText={(v) => updateIngredientText(sectionIndex, ingredientIndex, v)}
-                          multiline
-                          autoGrow
-                          minHeight={52}
-                        />
-                        <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-                          <PlatformPressable onPress={() => moveIngredient(sectionIndex, ingredientIndex, -1)} disabled={ingredientIndex === 0}>
-                            <MaterialCommunityIcons name='chevron-up' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
-                          </PlatformPressable>
-                          <PlatformPressable onPress={() => moveIngredient(sectionIndex, ingredientIndex, 1)} disabled={ingredientIndex === section.ingredients.length - 1}>
-                            <MaterialCommunityIcons name='chevron-down' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
-                          </PlatformPressable>
-                          <PlatformPressable onPress={() => removeIngredient(sectionIndex, ingredientIndex)}>
-                            <MaterialCommunityIcons name='close' size={20} style={{ color: globalColors(theme).subtext }} />
-                          </PlatformPressable>
-                        </View>
-                      </Section>
-                    ))}
+                    <Section gap={8}>
+                      {section.ingredients.map((ingredient: string, ingredientIndex: number) => (
+                        <Section key={`ing-${sectionIndex}-${ingredientIndex}`} horizontal gap={8} centerVertical>
+                          <Input
+                            style={{ flex: 1 }}
+                            placeholder='Ingrediente'
+                            value={ingredient}
+                            onChangeText={(v) => updateIngredientText(sectionIndex, ingredientIndex, v)}
+                            multiline
+                            autoGrow
+                            minHeight={52}
+                          />
+                          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+                            <PlatformPressable onPress={() => moveIngredient(sectionIndex, ingredientIndex, -1)} disabled={ingredientIndex === 0}>
+                              <MaterialCommunityIcons name='chevron-up' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
+                            </PlatformPressable>
+                            <PlatformPressable onPress={() => moveIngredient(sectionIndex, ingredientIndex, 1)} disabled={ingredientIndex === section.ingredients.length - 1}>
+                              <MaterialCommunityIcons name='chevron-down' size={18} style={{ color: globalColors(theme).subtext, marginHorizontal: 6 }} />
+                            </PlatformPressable>
+                            <PlatformPressable onPress={() => removeIngredient(sectionIndex, ingredientIndex)}>
+                              <MaterialCommunityIcons name='close' size={20} style={{ color: globalColors(theme).subtext }} />
+                            </PlatformPressable>
+                          </View>
+                        </Section>
+                      ))}
 
-                    <SlimSimpleButton onPress={() => addIngredient(sectionIndex)}>+ Ingrediente</SlimSimpleButton>
+                      <SlimSimpleButton onPress={() => addIngredient(sectionIndex)}>+ Ingrediente</SlimSimpleButton>
+                    </Section>
                   </Section>
-                </Section>
-              ))}
-            </Section>
-          )
+                ))}
+              </Section>
+            )}
+
+            <SlimSimpleButton onPress={addSection}>+ Seção de ingredientes</SlimSimpleButton>
+          </Section>
         )}
 
         <Section>
@@ -608,7 +609,7 @@ export default function AddRecipe({ navigation, route }: { navigation: AddRecipe
             <BigAccentButton onPress={handleSubmit}>{isEditing ? 'Atualizar receita' : 'Salvar receita'}</BigAccentButton>
           )}
         </Section>
-      </Section>
+        </Section>
     </ScreenWrapper>
   );
 }

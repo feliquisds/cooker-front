@@ -15,6 +15,8 @@ import ReadRecipe from '../screens/ReadRecipe';
 import ReadRecipeBook from '../screens/ReadRecipeBook';
 import ReadText from '../screens/ReadText';
 import AddRecipe from '../screens/AddRecipe';
+import AddRecipeBook from '../screens/AddRecipeBook';
+import EditRecipeBook from '../screens/EditRecipeBook';
 import { View } from 'react-native';
 
 type RootStackParamList = {
@@ -30,6 +32,8 @@ type RootStackParamList = {
     ReadRecipeBook: { bookId: string; title: string };
     ReadText: { textId: string };
     AddRecipe: undefined;
+    AddRecipeBook: undefined;
+    EditRecipeBook: { bookId?: string } | undefined;
 };
 
 const Stack = createStackNavigator<RootStackParamList>();
@@ -44,6 +48,7 @@ export default function StackNavigator() {
                 <View style={{ flex: 1, minHeight: 0 }}>
                     <NavigationContainer>
                         <Stack.Navigator
+                            id={undefined}
                             initialRouteName='Tabs'
                             screenOptions={{
                                 headerShown: false,
@@ -73,6 +78,8 @@ export default function StackNavigator() {
                                 )}
                             />
                             <Stack.Screen name='AddRecipe' component={AddRecipe} />
+                            <Stack.Screen name='AddRecipeBook' component={AddRecipeBook} />
+                            <Stack.Screen name='EditRecipeBook' component={EditRecipeBook} />
                             <Stack.Screen name='ReadText'
                                 children={({ navigation, route }) => (
                                     <ReadText navigation={navigation as any} textId={(route as any)?.params?.textId} />

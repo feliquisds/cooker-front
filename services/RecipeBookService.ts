@@ -9,15 +9,23 @@ export default class RecipeBookService {
     }
 
     async getRecipeBooks(): Promise<RecipeBook[]> {
-        return this.#adapter.get<RecipeBook[]>('/');
+        return this.#adapter.get<RecipeBook[]>('');
     }
 
     async getRecipeBookById(bookId: string): Promise<RecipeBook> {
         return this.#adapter.get<RecipeBook>(`/${bookId}`);
     }
 
-    async createRecipeBook(bookData: Partial<RecipeBook>): Promise<RecipeBook> {
-        return this.#adapter.post<RecipeBook>('/', bookData);
+    async createRecipeBook(bookData: RecipeBook): Promise<RecipeBook> {
+        return this.#adapter.post<RecipeBook>('', bookData);
+    }
+
+    async updateRecipeBook(bookData: RecipeBook): Promise<RecipeBook> {
+        return this.#adapter.post<RecipeBook>('', bookData);
+    }
+
+    async deleteRecipeBook(bookId: string): Promise<void> {
+        await this.#adapter.delete<void>(`/${bookId}`);
     }
 
     async searchRecipeBooks(title: string, tags: string[], authorHandle: string): Promise<RecipeBook[]> {

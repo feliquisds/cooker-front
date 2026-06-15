@@ -11,13 +11,15 @@ type ScreenProps = {
     children?: ReactNode;
     style?: StyleProp<ViewStyle>;
     containerStyle?: StyleProp<ViewStyle>;
+    overlay?: ReactNode;
+    overlayStyle?: StyleProp<ViewStyle>;
     fill?: boolean;
     scrollPadding?: boolean;
     tabScreen?: boolean;
     onRefresh?: () => Promise<void>;
 };
 
-export function SimpleScreen({ children, style, containerStyle, fill, scrollPadding, tabScreen, onRefresh }: ScreenProps) {
+export function SimpleScreen({ children, style, containerStyle, overlay, overlayStyle, fill, scrollPadding, tabScreen, onRefresh }: ScreenProps) {
     const [refreshing, setRefreshing] = useState(false);
     const { theme } = useThemeMode();
     const styles = globalStyles(theme);
@@ -36,28 +38,36 @@ export function SimpleScreen({ children, style, containerStyle, fill, scrollPadd
     };
 
     return (
-        <ScrollView
-            style={[styles.screen, style]}
-            contentContainerStyle={[
-                getGap(15),
-                containerStyle,
-                fill ? { flexGrow: 1 } : {},
-                scrollPadding ? scrollPaddingStyle : {},
-                tabScreen ? tabScreenPaddingStyle : {}
-            ]}
-            scrollEnabled={true}
-            refreshControl={
-                Platform.OS !== 'web' && onRefresh ? (
-                    <RefreshControl
-                        refreshing={refreshing}
-                        onRefresh={handleRefresh}
-                        progressViewOffset={0}
-                    />
-                ) : undefined
-            }
-        >
-            {children}
-        </ScrollView>
+        <View style={[styles.screen, { position: 'relative' }, style]}>
+            <ScrollView
+                style={{ flex: 1, minHeight: 0 }}
+                contentContainerStyle={[
+                    getGap(15),
+                    containerStyle,
+                    fill ? { flexGrow: 1 } : {},
+                    scrollPadding ? scrollPaddingStyle : {},
+                    tabScreen ? tabScreenPaddingStyle : {}
+                ]}
+                scrollEnabled={true}
+                refreshControl={
+                    Platform.OS !== 'web' && onRefresh ? (
+                        <RefreshControl
+                            refreshing={refreshing}
+                            onRefresh={handleRefresh}
+                            progressViewOffset={0}
+                        />
+                    ) : undefined
+                }
+            >
+                {children}
+            </ScrollView>
+
+            {overlay ? (
+                <View pointerEvents='box-none' style={[{ position: 'absolute', left: 0, right: 0, top: 0, bottom: 0 }, overlayStyle]}>
+                    {overlay}
+                </View>
+            ) : null}
+        </View>
     );
 }
 

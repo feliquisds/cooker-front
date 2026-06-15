@@ -13,11 +13,11 @@ export default class RecipeService {
         return this.#adapter.get<Recipe>(`/${recipeId}`);
     }
 
-    async createRecipe(recipeData: Partial<Recipe>): Promise<Recipe> {
-        return this.#adapter.post<Recipe>('/', recipeData);
+    async createRecipe(recipeData: Recipe): Promise<Recipe> {
+        return this.#adapter.post<Recipe>('', recipeData);
     }
 
-    async updateRecipe(recipeId: string, recipeData: Partial<Recipe>): Promise<Recipe> {
+    async updateRecipe(recipeId: string, recipeData: Recipe): Promise<Recipe> {
         return this.#adapter.put<Recipe>(`/${recipeId}`, recipeData);
     }
 

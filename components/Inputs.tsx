@@ -17,16 +17,52 @@ type InputProps = {
     autoCapitalize?: 'none' | 'sentences' | 'words' | 'characters';
     keyboardType?: 'default' | 'email-address' | 'numeric' | 'phone-pad' | 'number-pad' | 'decimal-pad' | 'visible-password';
     big?: boolean;
+    multiline?: boolean;
+    autoGrow?: boolean;
+    minHeight?: number;
+    maxHeight?: number;
+    numberOfLines?: number;
 };
 
-export function Input({ style, placeholder, placeholderTextColor = null, value, onChangeText, secureTextEntry, editable, autoCapitalize, keyboardType, big }: InputProps) {
+export function Input({
+    style,
+    placeholder,
+    placeholderTextColor = null,
+    value,
+    onChangeText,
+    secureTextEntry,
+    editable,
+    autoCapitalize,
+    keyboardType,
+    big,
+    multiline,
+    autoGrow,
+    minHeight = 52,
+    maxHeight,
+    numberOfLines
+}: InputProps) {
     const { theme } = useThemeMode();
     const defaultPlaceholderTextColor = globalColors(theme).subtext;
     const resolvedPlaceholderTextColor = placeholderTextColor == null ? defaultPlaceholderTextColor : placeholderTextColor;
+    const [contentHeight, setContentHeight] = useState(minHeight);
+    const shouldGrow = Boolean(multiline && autoGrow);
+
+    const handleContentSizeChange = shouldGrow
+        ? (event: any) => {
+            const nextHeight = Math.max(minHeight, event.nativeEvent.contentSize.height);
+            setContentHeight(maxHeight == null ? nextHeight : Math.min(nextHeight, maxHeight));
+        }
+        : undefined;
 
     return (
         <TextInput
-            style={[globalStyles(theme).input, big ? globalStyles(theme).header : {}, style]}
+            style={[
+                globalStyles(theme).input,
+                big ? globalStyles(theme).header : {},
+                multiline ? { textAlignVertical: 'top' } : {},
+                shouldGrow ? { minHeight, height: contentHeight } : {},
+                style
+            ]}
             placeholder={placeholder}
             placeholderTextColor={resolvedPlaceholderTextColor}
             secureTextEntry={secureTextEntry}
@@ -35,6 +71,9 @@ export function Input({ style, placeholder, placeholderTextColor = null, value, 
             editable={editable}
             autoCapitalize={autoCapitalize}
             keyboardType={keyboardType}
+            multiline={multiline}
+            numberOfLines={numberOfLines}
+            onContentSizeChange={handleContentSizeChange}
         />
     );
 }

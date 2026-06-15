@@ -1,5 +1,6 @@
-import { useEffect, useState } from 'react';
+import { useCallback, useState } from 'react';
 import { ActivityIndicator, Image, ImageStyle, Pressable } from 'react-native';
+import { useFocusEffect } from '@react-navigation/native';
 import { Section } from '../components/Alignments';
 import { SimpleScreen } from '../components/Interface';
 import { Subtext, TitleWithBackButton, Text, Header } from '../components/Texts';
@@ -15,6 +16,7 @@ import { Card, CardElement } from '../components/Cards';
 import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { BookContent } from '../components/BookContent';
 import { getAuthenticatedUserId } from '../services/AuthSession';
+import { PlatformPressable } from '@react-navigation/elements';
 
 type ReadRecipeBookNavigation = ScreenNavigation<{}> & {
     goBack: () => void;
@@ -33,37 +35,38 @@ export default function ReadRecipeBook({ navigation, bookId, title }: { navigati
     const [isSaved, setIsSaved] = useState(false);
     const [savingStatus, setSavingStatus] = useState(false);
 
-    useEffect(() => {
-        let mounted = true;
+    useFocusEffect(
+        useCallback(() => {
+            let mounted = true;
 
-        const fetchBook = async () => {
-            try {
-                const fetchedBook = await recipeBookService.getRecipeBookById(bookId);
-                if (mounted) {
-                    setBook(fetchedBook);
+            const run = async () => {
+                try {
+                    const fetchedBook = await recipeBookService.getRecipeBookById(bookId);
+                    if (mounted) {
+                        setBook(fetchedBook);
 
-                    try {
-                        const authId = await getAuthenticatedUserId();
-                        setAuthenticatedUserId(authId);
-                        const ownerProfile = await userService.getPublicProfileById(fetchedBook.ownerId);
-                        if (mounted) {
-                            setOwner(ownerProfile);
+                        try {
+                            const authId = await getAuthenticatedUserId();
+                            setAuthenticatedUserId(authId);
+                            const ownerProfile = await userService.getPublicProfileById(fetchedBook.ownerId);
+                            if (mounted) {
+                                setOwner(ownerProfile);
+                            }
+                        } catch (error) {
+                            console.error('Failed to fetch owner profile:', error);
                         }
-                    } catch (error) {
-                        console.error('Failed to fetch owner profile:', error);
                     }
+                } catch (error) {
+                    console.error('Failed to fetch book:', error);
                 }
-            } catch (error) {
-                console.error('Failed to fetch book:', error);
-            }
-        };
+            };
+            void run();
 
-        void fetchBook();
-
-        return () => {
-            mounted = false;
-        };
-    }, [bookId]);
+            return () => {
+                mounted = false;
+            };
+        }, [bookId])
+    );
 
     const toggleSaveBook = async () => {
         if (savingStatus) return;
@@ -85,12 +88,22 @@ export default function ReadRecipeBook({ navigation, bookId, title }: { navigati
     };
 
     const displayedTitle = book?.title ?? title ?? 'Livro de receitas';
+    const isOwner = Boolean(authenticatedUserId && book?.ownerId === authenticatedUserId);
 
     return (
         <SimpleScreen>
             <Section horizontal gap={10} centerVertical style={{ marginBottom: 10 }}>
                 <TitleWithBackButton navigation={navigation}>{displayedTitle}</TitleWithBackButton>
-                {book?.ownerId != authenticatedUserId && authenticatedUserId == null && (
+                {isOwner && (
+                    <PlatformPressable onPress={() => (navigation as any).navigate('EditRecipeBook', { bookId })}>
+                        <MaterialCommunityIcons
+                            name='pencil'
+                            size={22}
+                            color={globalColors(theme).text}
+                        />
+                    </PlatformPressable>
+                )}
+                {authenticatedUserId && !isOwner && (
                     <Pressable onPress={toggleSaveBook} disabled={savingStatus}>
                         <MaterialCommunityIcons
                             name={isSaved ? 'bookmark' : 'bookmark-outline'}

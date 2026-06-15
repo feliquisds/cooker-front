@@ -1,6 +1,7 @@
 import { useEffect, useState } from 'react';
-import { ActivityIndicator, Image, ImageStyle } from 'react-native';
+import { ActivityIndicator, Image, ImageStyle, StyleSheet, View } from 'react-native';
 import { PlatformPressable } from '@react-navigation/elements';
+import { MaterialCommunityIcons } from '@expo/vector-icons';
 import { Card, CardElement } from '../components/Cards';
 import { Section } from '../components/Alignments';
 import { SimpleScreen } from '../components/Interface';
@@ -12,9 +13,11 @@ import { RecipeBook } from '../model/RecipeBook';
 import type { UserPublic } from '../model/dto/UserPublic';
 import { useThemeMode } from '../components/ThemeProvider';
 import globalColors from '../styles/Colors';
+import { getAuthenticatedUserId } from '../services/AuthSession';
 
 type SavedNavigation = ScreenNavigation<{
     ReadRecipeBook: { bookId: string; title: string };
+    AddRecipeBook: undefined;
 }>;
 
 const recipeBookService = new RecipeBookService();
@@ -73,6 +76,7 @@ export default function Saved({ navigation }: { navigation: SavedNavigation }) {
     const [books, setBooks] = useState<RecipeBook[]>([]);
     const [authorAvatars, setAuthorAvatars] = useState<Record<string, string | null>>({});
     const [loading, setLoading] = useState(true);
+    const [authenticatedUserId, setAuthenticatedUserId] = useState<string | null>(null);
 
     const fetchSavedBooks = async () => {
         try {
@@ -98,13 +102,28 @@ export default function Saved({ navigation }: { navigation: SavedNavigation }) {
     };
 
     useEffect(() => {
+        void getAuthenticatedUserId().then(setAuthenticatedUserId);
         void fetchSavedBooks();
     }, []);
 
+    const floatingCreateButton = authenticatedUserId ? (
+        <View pointerEvents='box-none' style={localStyles.floatingButtonWrap}>
+            <PlatformPressable
+                onPress={() => (navigation as any).navigate('AddRecipeBook')}
+                style={[localStyles.floatingButton, { backgroundColor: globalColors(theme).accent[0] }]}
+            >
+                <MaterialCommunityIcons name='plus' size={20} color={globalColors(theme).buttonText} />
+                <Text style={{ color: globalColors(theme).buttonText }}>Novo livro</Text>
+            </PlatformPressable>
+        </View>
+    ) : null;
+
     return (
-        <SimpleScreen tabScreen onRefresh={fetchSavedBooks}>
+        <SimpleScreen tabScreen onRefresh={fetchSavedBooks} overlay={floatingCreateButton}>
             <Section gap={15}>
-                <Title>Salvo</Title>
+                <Section horizontal spaceBetween centerVertical>
+                    <Title>Salvo</Title>
+                </Section>
 
                 {loading ? (
                     <Section centerVertical style={{ minHeight: 240 }}>
@@ -132,10 +151,33 @@ export default function Saved({ navigation }: { navigation: SavedNavigation }) {
     );
 }
 
-const localStyles = {
+const localStyles = StyleSheet.create({
     avatar: {
         width: 56,
         height: 56,
         borderRadius: 28
-    } as ImageStyle
-};
+    },
+    floatingButtonWrap: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0
+    },
+    floatingButton: {
+        position: 'absolute',
+        right: 20,
+        bottom: 112,
+        flexDirection: 'row',
+        alignItems: 'center',
+        gap: 8,
+        paddingHorizontal: 18,
+        paddingVertical: 14,
+        borderRadius: 999,
+        shadowColor: '#000',
+        shadowOffset: { width: 0, height: 6 },
+        shadowOpacity: 0.2,
+        shadowRadius: 12,
+        elevation: 8
+    }
+});

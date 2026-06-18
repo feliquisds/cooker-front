@@ -19,6 +19,31 @@ import AddRecipeBook from '../screens/AddRecipeBook';
 import EditRecipeBook from '../screens/EditRecipeBook';
 import { View } from 'react-native';
 
+const linking = {
+    prefixes: ['/', 'http://localhost', 'https://localhost'],
+    config: {
+        screens: {
+            Tabs: {
+                path: '',
+                screens: {
+                    Home: 'home',
+                    Saved: 'saved',
+                    Search: 'search',
+                    Profile: 'profile'
+                }
+            },
+            Recovery: 'recovery',
+            Favorited: 'favorited',
+            ReadRecipe: 'recipe/:recipeId',
+            ReadRecipeBook: 'recipe-book/:bookId',
+            ReadText: 'text/:textId',
+            AddRecipe: 'recipe/new',
+            AddRecipeBook: 'recipe-book/new',
+            EditRecipeBook: 'recipe-book/:bookId/edit'
+        }
+    }
+};
+
 type RootStackParamList = {
     Tabs: undefined;
     Login: undefined;
@@ -46,7 +71,7 @@ export default function StackNavigator() {
             <SafeAreaView style={globalStyles().staticArea}>
                 <StatusBar style={theme === 'dark' ? 'light' : 'dark'} />
                 <View style={{ flex: 1, minHeight: 0 }}>
-                    <NavigationContainer>
+                    <NavigationContainer linking={linking}>
                         <Stack.Navigator
                             id={undefined}
                             initialRouteName='Tabs'

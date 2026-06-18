@@ -26,7 +26,11 @@ export function Title({ children, style }: TextProps) {
 }
 
 type TitleWithBackButtonProps = TextProps & {
-    navigation: { goBack: () => void };
+    navigation: {
+        goBack: () => void;
+        canGoBack?: () => boolean;
+        navigate?: (screen: string, params?: any) => void;
+    };
 };
 
 export function TitleWithBackButton({ children, style, navigation }: TitleWithBackButtonProps) {

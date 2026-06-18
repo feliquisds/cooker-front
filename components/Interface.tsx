@@ -143,14 +143,27 @@ export function Divider({ style }: { style?: StyleProp<ViewStyle> }) {
 }
 
 type BackButtonProps = {
-    navigation: { goBack: () => void };
+    navigation: {
+        goBack: () => void;
+        canGoBack?: () => boolean;
+        navigate?: (screen: string, params?: any) => void;
+    };
 };
 
 export function BackButton({ navigation }: BackButtonProps) {
     const { theme } = useThemeMode();
 
+    const handlePress = () => {
+        if (navigation.canGoBack?.()) {
+            navigation.goBack();
+            return;
+        }
+
+        navigation.navigate?.('Tabs');
+    };
+
     return (
-        <PlatformPressable style={globalStyles(theme).backButton} onPress={() => navigation.goBack()}>
+        <PlatformPressable style={globalStyles(theme).backButton} onPress={handlePress}>
             <MaterialCommunityIcons name='chevron-left' style={globalStyles(theme).backButtonIcon} />
         </PlatformPressable>
     );
